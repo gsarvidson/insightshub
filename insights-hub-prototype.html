@@ -300,6 +300,26 @@ td { padding: 9px 10px; vertical-align: top; }
 .view-meta { font-size: 11px; color: var(--color-text-tertiary); }
 .view-btn { font-size: 11px; padding: 2px 8px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); color: var(--color-text-secondary); cursor: pointer; background: var(--color-background-primary); }
 
+/* ── Add Feedback page ── */
+.af-field { margin-bottom: 0.875rem; }
+.af-label { display: block; font-size: 12px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 5px; }
+.af-req { color: var(--tm-pink); }
+.af-hint { font-weight: 400; color: var(--color-text-tertiary); }
+.af-input, .af-select, .af-textarea { width: 100%; font-size: 13px; font-family: var(--font-sans); color: var(--color-text-primary); background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 6px; padding: 8px 10px; transition: border-color 0.15s; }
+.af-input:focus, .af-select:focus, .af-textarea:focus { outline: none; border-color: var(--tm-blurple); box-shadow: 0 0 0 2px rgba(72,84,211,0.12); }
+.af-textarea { resize: vertical; line-height: 1.5; }
+.af-textarea-sm { min-height: 68px; }
+.af-sentiment-row { display: flex; gap: 6px; }
+.sent-btn { font-size: 12px; padding: 6px 10px; border-radius: 6px; border: 0.5px solid var(--color-border-secondary); cursor: pointer; background: var(--color-background-secondary); color: var(--color-text-secondary); transition: all 0.1s; white-space: nowrap; }
+.sent-btn:hover { border-color: var(--tm-blurple); }
+.sent-btn.active.sent-neg { background: var(--color-background-danger); border-color: var(--color-border-danger); color: var(--color-text-danger); }
+.sent-btn.active.sent-neu { background: var(--color-background-secondary); border-color: var(--color-border-primary); color: var(--color-text-primary); }
+.sent-btn.active.sent-pos { background: var(--color-background-success); border-color: var(--color-border-success); color: var(--color-text-success); }
+.recent-fb-item { padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.recent-fb-item:last-of-type { border-bottom: none; }
+.recent-fb-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; margin-bottom: 3px; }
+.recent-fb-meta { font-size: 11px; color: var(--color-text-tertiary); }
+
 .nav { background: var(--tm-blurple-dark) !important; display: flex; flex-direction: column; }
 .nav-logo { padding: 1.25rem 1.25rem 1rem !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; margin-bottom: 0.5rem !important; }
 .nav-logo-name { font-family: var(--font-display) !important; font-weight: 800 !important; font-size: 20px !important; color: var(--tm-kowhai) !important; text-transform: uppercase !important; line-height: 1 !important; }
@@ -336,6 +356,7 @@ body { background: var(--color-background-tertiary) !important; font-family: var
     <div class="nav-item" data-page="ai-assistant">AI Assistant</div>
     <div class="nav-item" data-page="sizing">Sizing</div>
     <div class="nav-divider"></div>
+    <div class="nav-item" data-page="add-feedback">Add feedback</div>
     <div class="nav-item" data-page="sources">Sources</div>
   </div>
 
@@ -660,6 +681,148 @@ body { background: var(--color-background-tertiary) !important; font-family: var
     </div>
   </div>
 
+  <!-- ═══════════════════════════════
+       PAGE: ADD FEEDBACK
+  ═══════════════════════════════ -->
+  <div class="page" id="page-add-feedback">
+    <div class="main">
+      <div class="page-title">Add feedback</div>
+      <div class="page-sub">Manually capture ad-hoc feedback that hasn't come through a connected channel</div>
+
+      <!-- Success banner (hidden by default) -->
+      <div id="addFeedbackSuccess" style="display:none;background:var(--color-background-success);border:0.5px solid var(--color-border-success);border-radius:6px;padding:0.75rem 1rem;margin-bottom:1.25rem;font-size:13px;color:var(--color-text-success);display:none;align-items:center;gap:8px">
+        <span style="font-size:16px">✓</span> Feedback saved and queued for AI analysis. It will appear in Feedback Explorer shortly.
+        <span style="margin-left:auto;cursor:pointer;color:var(--color-text-tertiary)" id="successClose">✕</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:1.25rem;align-items:start">
+
+        <!-- Left: form -->
+        <div>
+          <!-- Feedback text -->
+          <div class="af-field">
+            <label class="af-label">Feedback <span class="af-req">*</span></label>
+            <textarea id="af-text" class="af-textarea" placeholder="Paste or type the customer's feedback verbatim…" rows="5"></textarea>
+          </div>
+
+          <!-- Source + Customer type row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem">
+            <div class="af-field">
+              <label class="af-label">Source <span class="af-req">*</span></label>
+              <select id="af-source" class="af-select">
+                <option value="">— Select source —</option>
+                <option>Sales call</option>
+                <option>User interview</option>
+                <option>Support email</option>
+                <option>In-person conversation</option>
+                <option>Social media</option>
+                <option>Internal (PM / design / eng)</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="af-field">
+              <label class="af-label">Customer type</label>
+              <select id="af-ctype" class="af-select">
+                <option value="">— Select —</option>
+                <option>Buyer</option>
+                <option>Seller</option>
+                <option>Both</option>
+                <option>Unknown</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Customer identifier -->
+          <div class="af-field">
+            <label class="af-label">Customer identifier <span class="af-hint">(optional)</span></label>
+            <input id="af-customer" class="af-input" type="text" placeholder="e.g. member ID, email, or anonymous">
+          </div>
+
+          <!-- Date + Sentiment row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem">
+            <div class="af-field">
+              <label class="af-label">Date of feedback</label>
+              <input id="af-date" class="af-input" type="date">
+            </div>
+            <div class="af-field">
+              <label class="af-label">Sentiment</label>
+              <div class="af-sentiment-row" id="af-sentiment">
+                <div class="sent-btn sent-neg" data-val="neg">😤 Negative</div>
+                <div class="sent-btn sent-neu" data-val="neu">😐 Neutral</div>
+                <div class="sent-btn sent-pos" data-val="pos">😊 Positive</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Opportunity link -->
+          <div class="af-field">
+            <label class="af-label">Link to opportunity <span class="af-hint">(optional)</span></label>
+            <select id="af-opp" class="af-select">
+              <option value="">— Don't link / let AI suggest —</option>
+              <option>Fix checkout payment failures</option>
+              <option>Improve mobile search relevance</option>
+              <option>Clarify seller fee structure</option>
+              <option>Photo upload errors</option>
+              <option>Watch list notifications</option>
+              <option>Buyer messaging UX</option>
+            </select>
+          </div>
+
+          <!-- Tags -->
+          <div class="af-field">
+            <label class="af-label">Tags <span class="af-hint">(optional — comma separated)</span></label>
+            <input id="af-tags" class="af-input" type="text" placeholder="e.g. payments, mobile, checkout">
+          </div>
+
+          <!-- Notes -->
+          <div class="af-field">
+            <label class="af-label">Internal notes <span class="af-hint">(not shown to customers)</span></label>
+            <textarea id="af-notes" class="af-textarea af-textarea-sm" placeholder="Context about where this came from, who raised it, any nuance…" rows="3"></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div style="display:flex;gap:8px;margin-top:0.25rem">
+            <button class="act-btn act-btn-primary" id="af-submit">Save feedback</button>
+            <button class="act-btn" id="af-clear">Clear form</button>
+          </div>
+        </div>
+
+        <!-- Right: tips + recent -->
+        <div>
+          <div class="card" style="margin-bottom:1rem">
+            <div class="card-title">💡 Tips</div>
+            <ul style="font-size:12px;color:var(--color-text-secondary);line-height:1.7;padding-left:1rem">
+              <li>Paste the verbatim quote where possible — AI analysis works best on original language</li>
+              <li>Link to an opportunity if you know it; otherwise AI will suggest the best match</li>
+              <li>Use tags to group related ad-hoc feedback before AI clusters it</li>
+              <li>Internal notes help your team understand context without polluting the data</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Recently added manually</div>
+            <div class="recent-fb-item">
+              <div class="recent-fb-text">"The listing form on iPad is totally broken — fields overlap each other."</div>
+              <div class="recent-fb-meta">User interview · Seller · Added by you · 1h ago</div>
+            </div>
+            <div class="recent-fb-item">
+              <div class="recent-fb-text">"I wish I could bulk-edit my listings without going one by one."</div>
+              <div class="recent-fb-meta">Sales call · Seller · Added by you · Yesterday</div>
+            </div>
+            <div class="recent-fb-item">
+              <div class="recent-fb-text">"Got confusing emails about a listing I never created — suspect account issue?"</div>
+              <div class="recent-fb-meta">Support email · Buyer · Added by Sarah K · 2 days ago</div>
+            </div>
+            <div style="margin-top:10px">
+              <span class="action-link" data-goto="feedback">View all feedback →</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div><!-- end shell -->
 
 <script>
@@ -872,7 +1035,7 @@ let activeDrawerRow = null;
 function renderFeedbackTable() {
   const tbody = document.getElementById('feedbackTableBody');
   tbody.innerHTML = feedbackRows.map((row, i) => `
-    <tr data-idx="${i}" class="${i===0?'selected':''}">
+    <tr data-idx="${i}">
       <td><div class="cell-text">${row.text}</div><div class="cell-meta">${row.meta}</div></td>
       <td><span class="source-badge src-${row.src}">${row.srcLabel}</span></td>
       <td style="white-space:nowrap;color:var(--color-text-secondary)">${row.date}</td>
@@ -964,7 +1127,9 @@ function renderDrawer(idx) {
 }
 
 renderFeedbackTable();
-renderDrawer(0);
+// Hide drawer on initial load - open only when a row is clicked
+document.getElementById('feedbackDrawer').classList.add('hidden');
+document.getElementById('feedbackLayout').classList.add('no-drawer');
 
 // ══════════════════════════════════
 // FEEDBACK CHART
@@ -1156,6 +1321,72 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
   });
+});
+
+// ══════════════════════════════════
+// ADD FEEDBACK PAGE
+// ══════════════════════════════════
+
+// Set today's date as default
+const afDateInput = document.getElementById('af-date');
+if (afDateInput) {
+  const today = new Date().toISOString().split('T')[0];
+  afDateInput.value = today;
+}
+
+// Sentiment toggle
+let selectedSentiment = null;
+document.querySelectorAll('.sent-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sent-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedSentiment = btn.dataset.val;
+  });
+});
+
+// Submit
+document.getElementById('af-submit').addEventListener('click', () => {
+  const text = document.getElementById('af-text').value.trim();
+  const source = document.getElementById('af-source').value;
+  if (!text || !source) {
+    document.getElementById('af-text').style.borderColor = text ? '' : 'var(--tm-pink)';
+    document.getElementById('af-source').style.borderColor = source ? '' : 'var(--tm-pink)';
+    return;
+  }
+  // Show success
+  document.getElementById('af-text').style.borderColor = '';
+  document.getElementById('af-source').style.borderColor = '';
+  const banner = document.getElementById('addFeedbackSuccess');
+  banner.style.display = 'flex';
+  // Clear form
+  document.getElementById('af-text').value = '';
+  document.getElementById('af-source').value = '';
+  document.getElementById('af-ctype').value = '';
+  document.getElementById('af-customer').value = '';
+  document.getElementById('af-opp').value = '';
+  document.getElementById('af-tags').value = '';
+  document.getElementById('af-notes').value = '';
+  document.querySelectorAll('.sent-btn').forEach(b => b.classList.remove('active'));
+  selectedSentiment = null;
+  afDateInput.value = new Date().toISOString().split('T')[0];
+});
+
+// Clear
+document.getElementById('af-clear').addEventListener('click', () => {
+  ['af-text','af-source','af-ctype','af-customer','af-opp','af-tags','af-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.style.borderColor = '';
+  });
+  document.querySelectorAll('.sent-btn').forEach(b => b.classList.remove('active'));
+  selectedSentiment = null;
+  afDateInput.value = new Date().toISOString().split('T')[0];
+  document.getElementById('addFeedbackSuccess').style.display = 'none';
+});
+
+// Dismiss success banner
+document.getElementById('successClose').addEventListener('click', () => {
+  document.getElementById('addFeedbackSuccess').style.display = 'none';
 });
 
 </script>
