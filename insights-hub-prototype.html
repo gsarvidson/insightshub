@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insights Hub — Trade Me</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+
+  --tm-blurple: #4854D3; --tm-blurple-dark: #0916A6; --tm-blurple-light: #A3A9E9; --tm-blurple-lighter: #D1D4F4;
+  --tm-kowhai: #FFEB33; --tm-kowhai-dark: #FFDA00; --tm-kowhai-lighter: #FFFACC;
+  --tm-charcoal: #2F2C28; --tm-pink: #DE0270; --tm-amber: #FFC041;
+  --color-text-primary: #2F2C28; --color-text-secondary: #5a5751; --color-text-tertiary: #9b9b9b;
+  --color-background-primary: #ffffff; --color-background-secondary: #F4F4FC; --color-background-tertiary: #EAEAF8;
+  --color-border-tertiary: rgba(72,84,211,0.1); --color-border-secondary: rgba(72,84,211,0.22);
+  --color-border-primary: rgba(72,84,211,0.35);
+  --color-text-danger: #A32D2D; --color-text-success: #3B6D11; --color-text-warning: #854F0B;
+  --color-background-info: #D1D4F4; --color-background-danger: #FCEBEB;
+  --color-background-success: #EAF3DE; --color-background-warning: #FAEEDA;
+  --color-border-info: #A3A9E9; --color-border-danger: #F7C1C1;
+  --color-border-success: #C0DD97; --color-border-warning: #FAC775;
+  --color-text-info: #0916A6;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); background: var(--color-background-tertiary); display: flex; justify-content: center; min-height: 100vh; padding: 2rem; }
+
+/* ── Shell ── */
+.shell { display: grid; grid-template-columns: 200px 1fr; min-height: 680px; width: 100%; max-width: 1100px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; background: var(--color-background-primary); box-shadow: 0 2px 16px rgba(0,0,0,0.07); }
+
+/* ── Nav ── */
+.nav { background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); padding: 1rem 0; display: flex; flex-direction: column; }
+.nav-logo { padding: 0 1rem 1.25rem; font-size: 15px; font-weight: 500; color: var(--color-text-primary); border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 0.75rem; }
+.nav-logo span { color: var(--color-text-secondary); font-weight: 400; font-size: 13px; display: block; margin-top: 2px; }
+.nav-item { padding: 8px 1rem; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; transition: background 0.1s; }
+.nav-item:hover { background: rgba(0,0,0,0.04); }
+.nav-item.active { color: var(--color-text-primary); background: var(--color-background-primary); font-weight: 500; }
+.nav-divider { border-top: 0.5px solid var(--color-border-tertiary); margin-top: 1rem; padding-top: 0.75rem; }
+
+/* ── Pages ── */
+.page { display: none; flex-direction: column; overflow: hidden; flex: 1; }
+.page.active { display: flex; }
+
+/* ── Shared main content area ── */
+.main { padding: 1.5rem; overflow: auto; background: var(--color-background-primary); flex: 1; }
+.page-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.25rem; }
+.page-sub { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1.5rem; }
+
+/* ── Metrics ── */
+.metrics { display: grid; gap: 12px; margin-bottom: 1.5rem; }
+.metrics-4 { grid-template-columns: repeat(4, 1fr); }
+.metrics-5 { grid-template-columns: repeat(5, 1fr); }
+.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.875rem 1rem; }
+.metric-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.metric-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.metric-delta { font-size: 12px; margin-top: 4px; }
+.delta-up { color: var(--color-text-danger); }
+.delta-down { color: var(--color-text-success); }
+.metric-sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 3px; }
+
+/* ── Cards ── */
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+.card:last-child { margin-bottom: 0; }
+.card-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 1rem; }
+
+/* ── Grid layouts ── */
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; }
+
+/* ── AI Summary box ── */
+.ai-box { background: var(--color-background-info); border: 0.5px solid var(--color-border-info); border-radius: var(--border-radius-md); padding: 0.875rem 1rem; margin-bottom: 1.5rem; }
+.ai-label { font-size: 11px; color: var(--color-text-info); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+.ai-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.6; }
+
+/* ── Spark rows (dashboard themes) ── */
+.spark-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid var(--color-border-tertiary); cursor: pointer; }
+.spark-row:last-child { border-bottom: none; }
+.spark-row:hover .spark-label { color: var(--color-text-info); }
+.spark-label { font-size: 12px; color: var(--color-text-primary); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.15s; }
+.trend-chip { display: inline-flex; align-items: center; font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--color-background-danger); color: var(--color-text-danger); font-weight: 500; white-space: nowrap; }
+.spark-bar-wrap { width: 80px; height: 6px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+.spark-bar { height: 100%; border-radius: 3px; }
+.spark-count { font-size: 12px; color: var(--color-text-secondary); width: 28px; text-align: right; }
+
+/* ── Chart bars ── */
+.chart-area { height: 80px; display: flex; align-items: flex-end; gap: 3px; padding-top: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 8px; }
+.bar { border-radius: 2px 2px 0 0; flex: 1; }
+.chart-labels { display: flex; gap: 3px; }
+.chart-label { flex: 1; font-size: 10px; color: var(--color-text-tertiary); text-align: center; }
+
+/* ── Alerts ── */
+.alert-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.alert-row:last-child { border-bottom: none; }
+.alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.alert-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.4; }
+.alert-time { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+
+/* ── Source rows ── */
+.source-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
+.source-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.source-name { font-size: 12px; color: var(--color-text-primary); flex: 1; }
+.source-count { font-size: 12px; color: var(--color-text-secondary); }
+.source-pct { font-size: 11px; color: var(--color-text-tertiary); width: 30px; text-align: right; }
+
+/* ═══════════════════════════════
+   OPPORTUNITIES PAGE
+═══════════════════════════════ */
+.opp-layout { display: grid; grid-template-columns: 1fr 340px; flex: 1; overflow: hidden; }
+.list-pane { padding: 1.5rem; border-right: 0.5px solid var(--color-border-tertiary); overflow: auto; }
+.detail-pane { padding: 1.5rem; overflow: auto; background: var(--color-background-primary); }
+
+.toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+.tb-btn { font-size: 12px; padding: 5px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; }
+.tb-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); font-weight: 500; }
+.spacer { flex: 1; }
+.new-btn { font-size: 12px; padding: 5px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; }
+
+.opp-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.875rem 1rem; margin-bottom: 8px; cursor: pointer; background: var(--color-background-primary); transition: border-color 0.15s, background 0.15s; }
+.opp-card:hover { border-color: rgba(0,0,0,0.25); }
+.opp-card.selected { border: 1px solid #378ADD; background: var(--color-background-info); }
+.opp-head { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.opp-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); flex: 1; }
+.status-pill { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; white-space: nowrap; }
+.s-review { background: #FAEEDA; color: #854F0B; }
+.s-road { background: #EAF3DE; color: #3B6D11; }
+.s-new { background: #FCEBEB; color: #A32D2D; }
+.opp-meta { display: flex; align-items: center; gap: 12px; }
+.meta-item { font-size: 11px; color: var(--color-text-secondary); }
+.score-bar-wrap { width: 60px; height: 4px; background: var(--color-background-secondary); border-radius: 2px; overflow: hidden; }
+.score-bar { height: 100%; border-radius: 2px; }
+
+.detail-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.25rem; }
+.detail-sub { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 1rem; }
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+.stat-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem; }
+.stat-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.stat-val { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+.section-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.source-chip { display: inline-flex; font-size: 11px; padding: 3px 8px; border-radius: 10px; border: 0.5px solid var(--color-border-tertiary); margin: 0 4px 4px 0; color: var(--color-text-secondary); }
+.feedback-item { border-left: 2px solid #B5D4F4; padding: 6px 8px; margin-bottom: 6px; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; }
+.fb-source { font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 2px; }
+.fb-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; }
+.tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--color-background-secondary); color: var(--color-text-secondary); margin: 0 4px 4px 0; }
+.tag-row { margin-bottom: 1rem; }
+.action-link { font-size: 12px; color: var(--color-text-info); cursor: pointer; margin-top: 8px; display: inline-block; }
+.action-link:hover { text-decoration: underline; }
+
+/* ═══════════════════════════════
+   FEEDBACK EXPLORER PAGE
+═══════════════════════════════ */
+.feedback-layout { display: grid; grid-template-columns: 1fr 360px; flex: 1; overflow: hidden; }
+.table-pane { padding: 1.5rem; overflow: auto; border-right: 0.5px solid var(--color-border-tertiary); }
+.drawer { background: var(--color-background-primary); overflow: auto; display: flex; flex-direction: column; }
+.drawer-header { padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.drawer-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); line-height: 1.5; flex: 1; }
+.close-btn { width: 24px; height: 24px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.drawer-body { padding: 1.25rem; flex: 1; overflow: auto; }
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
+.meta-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.625rem 0.75rem; }
+.meta-label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 3px; }
+.meta-val { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.drawer-section { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; margin-top: 1.25rem; }
+.verbatim-box { background: var(--color-background-secondary); padding: 0.875rem 1rem; font-size: 13px; color: var(--color-text-primary); line-height: 1.6; font-style: italic; margin-bottom: 1.25rem; border-left: 3px solid #B5D4F4; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; }
+.tag-dashed { border-style: dashed; color: var(--color-text-tertiary); }
+.opp-link-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); margin-bottom: 6px; cursor: pointer; transition: background 0.1s; }
+.opp-link-row:hover { background: var(--color-background-secondary); }
+.opp-link-name { font-size: 12px; color: var(--color-text-info); flex: 1; }
+.opp-pill { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #FCEBEB; color: #A32D2D; font-weight: 500; }
+.ai-suggest { background: var(--color-background-info); border: 0.5px solid var(--color-border-info); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; font-size: 12px; color: var(--color-text-primary); line-height: 1.6; }
+.ai-suggest-label { font-size: 11px; color: var(--color-text-info); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+.action-row { display: flex; gap: 6px; margin-top: 1.25rem; flex-wrap: wrap; }
+.act-btn { font-size: 11px; padding: 5px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; }
+.act-btn-primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+
+.chart-panel { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.25rem; background: var(--color-background-primary); }
+.chart-panel-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; gap: 12px; flex-wrap: wrap; }
+.chart-panel-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+.chart-panel-sub { font-size: 12px; color: var(--color-text-secondary); }
+.theme-toggles { display: flex; flex-wrap: wrap; gap: 6px; }
+.theme-toggle { display: flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 10px; border: 1.5px solid transparent; cursor: pointer; font-size: 12px; font-weight: 500; transition: opacity 0.15s; user-select: none; }
+.theme-toggle.inactive { opacity: 0.35; background: var(--color-background-secondary) !important; border-color: transparent !important; color: var(--color-text-tertiary) !important; }
+.theme-toggle-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.chart-wrap { position: relative; height: 190px; }
+
+.filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; padding: 0.875rem 1rem; background: var(--color-background-secondary); border-radius: var(--border-radius-md); }
+.filter-label { font-size: 12px; color: var(--color-text-secondary); font-weight: 500; }
+.filter-select { font-size: 12px; padding: 4px 8px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); }
+.search-input { font-size: 12px; padding: 4px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); flex: 1; min-width: 160px; }
+.saved-chip { font-size: 11px; padding: 3px 10px; border-radius: 10px; background: var(--color-background-info); color: var(--color-text-info); border: 0.5px solid var(--color-border-info); cursor: pointer; }
+.clear-btn { font-size: 11px; color: var(--color-text-tertiary); cursor: pointer; margin-left: auto; }
+.active-filters-row { display: flex; align-items: center; gap: 6px; margin-bottom: 0.75rem; flex-wrap: wrap; }
+.active-filter { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); color: var(--color-text-primary); }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead th { text-align: left; padding: 8px 10px; color: var(--color-text-secondary); font-weight: 500; border-bottom: 0.5px solid var(--color-border-tertiary); white-space: nowrap; }
+tbody tr { border-bottom: 0.5px solid var(--color-border-tertiary); cursor: pointer; transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--color-background-secondary); }
+tbody tr.selected { background: #E6F1FB; }
+td { padding: 9px 10px; vertical-align: top; }
+.cell-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; max-width: 280px; }
+.cell-meta { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+.source-badge { font-size: 11px; padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
+.src-sf { background: #FCEBEB; color: #A32D2D; }
+.src-csat { background: #E6F1FB; color: #185FA5; }
+.src-nps { background: #FAEEDA; color: #854F0B; }
+.src-slack { background: #EAF3DE; color: #3B6D11; }
+.sentiment { font-size: 11px; padding: 2px 7px; border-radius: 10px; }
+.sent-neg { background: #FCEBEB; color: #A32D2D; }
+.sent-neu { background: #F1EFE8; color: #5F5E5A; }
+.sent-pos { background: #EAF3DE; color: #3B6D11; }
+.theme-tag { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 10px; background: var(--color-background-secondary); color: var(--color-text-secondary); margin: 1px; }
+.opp-link { font-size: 11px; color: var(--color-text-info); cursor: pointer; }
+.opp-link:hover { text-decoration: underline; }
+.pagination { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; font-size: 12px; color: var(--color-text-secondary); }
+.pg-btn { padding: 4px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; font-size: 12px; }
+
+/* Drawer hidden state */
+.drawer.hidden { display: none; }
+.feedback-layout.no-drawer { grid-template-columns: 1fr; }
+
+/* ═══════════════════════════════
+   AI ASSISTANT PAGE
+═══════════════════════════════ */
+.chat-pane { display: flex; flex-direction: column; flex: 1; }
+.chat-header { padding: 1.25rem 1.5rem 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.chat-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.25rem; }
+.chat-sub { font-size: 13px; color: var(--color-text-secondary); }
+.suggested { display: flex; gap: 8px; flex-wrap: wrap; padding: 1rem 1.5rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.sug-label { font-size: 11px; color: var(--color-text-tertiary); width: 100%; margin-bottom: 2px; }
+.sug-pill { font-size: 12px; padding: 5px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: 10px; color: var(--color-text-secondary); cursor: pointer; background: var(--color-background-primary); transition: background 0.1s, color 0.1s; }
+.sug-pill:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.messages { flex: 1; padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; overflow: auto; }
+.msg { display: flex; gap: 10px; align-items: flex-start; }
+.msg.user { flex-direction: row-reverse; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+.av-ai { background: var(--color-background-info); color: var(--color-text-info); }
+.av-user { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+.bubble { max-width: 76%; padding: 0.75rem 1rem; border-radius: var(--border-radius-lg); font-size: 13px; line-height: 1.6; color: var(--color-text-primary); }
+.bubble-ai { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); }
+.bubble-user { background: var(--color-background-info); border: 0.5px solid var(--color-border-info); }
+.bubble ol { padding-left: 1.25rem; margin-top: 6px; }
+.bubble li { margin-bottom: 4px; font-size: 13px; }
+.export-row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.export-btn { font-size: 11px; padding: 3px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); color: var(--color-text-secondary); cursor: pointer; background: var(--color-background-primary); transition: background 0.1s; }
+.export-btn:hover { background: var(--color-background-secondary); }
+.input-row { padding: 1rem 1.5rem; border-top: 0.5px solid var(--color-border-tertiary); display: flex; gap: 8px; align-items: flex-end; }
+.chat-input { flex: 1; font-size: 13px; padding: 8px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); resize: none; min-height: 36px; font-family: var(--font-sans); }
+.send-btn { padding: 8px 16px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; }
+
+/* ═══════════════════════════════
+   SIZING PAGE
+═══════════════════════════════ */
+.opp-selector { display: flex; gap: 8px; margin-bottom: 1.5rem; align-items: center; flex-wrap: wrap; }
+.sel-label { font-size: 12px; color: var(--color-text-secondary); }
+.opp-select { font-size: 13px; padding: 6px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); min-width: 220px; }
+.action-btn { font-size: 12px; padding: 6px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; }
+.trend-chart { height: 120px; display: flex; align-items: flex-end; gap: 4px; padding-top: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 8px; }
+.t-bar { flex: 1; border-radius: 2px 2px 0 0; }
+.seg-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.seg-row:last-child { border-bottom: none; }
+.seg-label { font-size: 12px; color: var(--color-text-primary); flex: 1; }
+.seg-bar-wrap { width: 70px; height: 6px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden; }
+.seg-bar { height: 100%; border-radius: 3px; }
+.seg-pct { font-size: 11px; color: var(--color-text-secondary); width: 28px; text-align: right; }
+.freq-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.freq-row:last-child { border-bottom: none; }
+.freq-label { font-size: 12px; color: var(--color-text-secondary); }
+.freq-val { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.confidence { display: flex; align-items: center; gap: 8px; margin-top: 1rem; padding: 0.75rem; background: var(--color-background-warning); border-radius: var(--border-radius-md); }
+.conf-dots { display: flex; gap: 3px; }
+.conf-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* ═══════════════════════════════
+   SOURCES PAGE
+═══════════════════════════════ */
+.tabs { display: flex; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.5rem; }
+.tab { font-size: 13px; padding: 8px 16px; color: var(--color-text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -0.5px; transition: color 0.1s; }
+.tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); font-weight: 500; }
+.section-label-sm { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.875rem; }
+.source-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 1rem; background: var(--color-background-primary); }
+.src-icon { width: 36px; height: 36px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+.src-body { flex: 1; }
+.src-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+.src-meta { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.src-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.src-btn { font-size: 11px; padding: 3px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); color: var(--color-text-secondary); cursor: pointer; background: var(--color-background-primary); }
+.status-wrap { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; }
+.add-card { border: 0.5px dashed var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; margin-bottom: 1.5rem; transition: background 0.1s; }
+.add-card:hover { background: var(--color-background-secondary); }
+.add-text { font-size: 13px; color: var(--color-text-secondary); }
+.saved-views { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.view-row { display: flex; align-items: center; gap: 8px; padding: 10px 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.view-row:last-child { border-bottom: none; }
+.view-name { font-size: 13px; color: var(--color-text-primary); flex: 1; }
+.view-meta { font-size: 11px; color: var(--color-text-tertiary); }
+.view-btn { font-size: 11px; padding: 2px 8px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); color: var(--color-text-secondary); cursor: pointer; background: var(--color-background-primary); }
+
+.nav { background: var(--tm-blurple-dark) !important; display: flex; flex-direction: column; }
+.nav-logo { padding: 1.25rem 1.25rem 1rem !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; margin-bottom: 0.5rem !important; }
+.nav-logo-name { font-family: var(--font-display) !important; font-weight: 800 !important; font-size: 20px !important; color: var(--tm-kowhai) !important; text-transform: uppercase !important; line-height: 1 !important; }
+.nav-logo-sub { font-size: 11px !important; color: rgba(255,255,255,0.4) !important; margin-top: 3px !important; text-transform: uppercase !important; letter-spacing: 0.04em !important; }
+.nav-item { color: rgba(255,255,255,0.6) !important; font-size: 13px !important; padding: 9px 1.25rem !important; cursor: pointer !important; }
+.nav-item:hover { color: rgba(255,255,255,0.9) !important; background: rgba(255,255,255,0.06) !important; }
+.nav-item.active { color: var(--tm-kowhai) !important; background: rgba(255,235,51,0.1) !important; font-weight: 500 !important; border-right: 3px solid var(--tm-kowhai) !important; }
+.nav-section { color: rgba(255,255,255,0.3) !important; font-size: 10px !important; }
+.nav-divider { border-top: 1px solid rgba(255,255,255,0.08) !important; }
+.page-title { font-family: var(--font-display) !important; font-weight: 700 !important; font-size: 26px !important; text-transform: uppercase !important; letter-spacing: 0.01em !important; line-height: 1.1 !important; }
+.card-title { font-family: var(--font-display) !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.04em !important; }
+.ai-box { background: linear-gradient(135deg, var(--tm-blurple-dark) 0%, var(--tm-blurple) 100%) !important; border: none !important; }
+.ai-label { color: var(--tm-kowhai) !important; font-family: var(--font-display) !important; }
+.ai-text { color: rgba(255,255,255,0.9) !important; }
+.ai-text strong { color: var(--tm-kowhai) !important; }
+.metric { border-top: 3px solid var(--tm-blurple) !important; }
+.metric-value { font-family: var(--font-display) !important; font-weight: 700 !important; }
+body { background: var(--color-background-tertiary) !important; font-family: var(--font-sans) !important; }
+.shell { box-shadow: 0 4px 32px rgba(9,22,166,0.12) !important; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ═══ NAV ═══ -->
+  <div class="nav">
+    <div class="nav-logo">
+      <div class="nav-logo-name">Insights Hub</div>
+      <div class="nav-logo-sub">Trade Me</div>
+    </div>
+    <div class="nav-item active" data-page="dashboard">Dashboard</div>
+    <div class="nav-item" data-page="opportunities">Opportunities</div>
+    <div class="nav-item" data-page="feedback">Feedback</div>
+    <div class="nav-item" data-page="ai-assistant">AI Assistant</div>
+    <div class="nav-item" data-page="sizing">Sizing</div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" data-page="sources">Sources</div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       PAGE: DASHBOARD
+  ═══════════════════════════════ -->
+  <div class="page active" id="page-dashboard">
+    <div class="main">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Last 30 days · All sources</div>
+      <div class="metrics metrics-4">
+        <div class="metric"><div class="metric-label">Total feedback</div><div class="metric-value">2,847</div><div class="metric-delta delta-up">↑ 14% vs last month</div></div>
+        <div class="metric"><div class="metric-label">Open opportunities</div><div class="metric-value">34</div><div class="metric-delta delta-up">↑ 6 new this week</div></div>
+        <div class="metric"><div class="metric-label">Trending themes</div><div class="metric-value">8</div><div class="metric-delta delta-up">↑ 3 since yesterday</div></div>
+        <div class="metric"><div class="metric-label">Avg sentiment</div><div class="metric-value">62%</div><div class="metric-delta delta-down">↓ 4% vs last month</div></div>
+      </div>
+      <div class="ai-box">
+        <div class="ai-label">AI summary</div>
+        <div class="ai-text">Top issues this week: <strong>checkout payment failures</strong> (up 40%), <strong>search relevance on mobile</strong> (persistent, 3 weeks), and <strong>seller fee confusion</strong> after recent pricing changes. Recommend reviewing checkout error logs and the seller comms flow.</div>
+      </div>
+      <div class="grid-2-1">
+        <div>
+          <div class="card">
+            <div class="card-title">Top trending themes</div>
+            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Checkout payment failures</span><span class="trend-chip">↑ spike</span><div class="spark-bar-wrap" style="margin-left:8px"><div class="spark-bar" style="width:88%;background:#E24B4A"></div></div><span class="spark-count">247</span></div>
+            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Search relevance mobile</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:72%;background:#EF9F27"></div></div><span class="spark-count">189</span></div>
+            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Seller fee confusion</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:65%;background:#EF9F27"></div></div><span class="spark-count">164</span></div>
+            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Photo upload errors</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:48%;background:#378ADD"></div></div><span class="spark-count">121</span></div>
+            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Watch list notifications</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:38%;background:#378ADD"></div></div><span class="spark-count">97</span></div>
+            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Buyer messaging UX</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:29%;background:#1D9E75"></div></div><span class="spark-count">74</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Feedback volume — last 7 days</div>
+            <div class="chart-area">
+              <div class="bar" style="height:35%;background:#B5D4F4"></div>
+              <div class="bar" style="height:55%;background:#85B7EB"></div>
+              <div class="bar" style="height:45%;background:#85B7EB"></div>
+              <div class="bar" style="height:70%;background:#378ADD"></div>
+              <div class="bar" style="height:60%;background:#378ADD"></div>
+              <div class="bar" style="height:80%;background:#185FA5"></div>
+              <div class="bar" style="height:65%;background:#185FA5"></div>
+            </div>
+            <div class="chart-labels">
+              <div class="chart-label">M</div><div class="chart-label">T</div><div class="chart-label">W</div><div class="chart-label">T</div><div class="chart-label">F</div><div class="chart-label">S</div><div class="chart-label">S</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-title">Alerts</div>
+            <div class="alert-row"><div class="alert-dot" style="background:#E24B4A"></div><div><div class="alert-text">Payment failure mentions up 40% in 24h</div><div class="alert-time">2 hours ago</div></div></div>
+            <div class="alert-row"><div class="alert-dot" style="background:#EF9F27"></div><div><div class="alert-text">New theme detected: "listing draft lost"</div><div class="alert-time">5 hours ago</div></div></div>
+            <div class="alert-row"><div class="alert-dot" style="background:#378ADD"></div><div><div class="alert-text">Salesforce case volume above threshold</div><div class="alert-time">Yesterday</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Feedback by source</div>
+            <div class="source-row"><div class="source-dot" style="background:#E24B4A"></div><span class="source-name">Salesforce cases</span><span class="source-count">1,204</span><span class="source-pct">42%</span></div>
+            <div class="source-row"><div class="source-dot" style="background:#378ADD"></div><span class="source-name">CSAT surveys</span><span class="source-count">847</span><span class="source-pct">30%</span></div>
+            <div class="source-row"><div class="source-dot" style="background:#EF9F27"></div><span class="source-name">NPS responses</span><span class="source-count">512</span><span class="source-pct">18%</span></div>
+            <div class="source-row"><div class="source-dot" style="background:#1D9E75"></div><span class="source-name">Slack feedback</span><span class="source-count">284</span><span class="source-pct">10%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       PAGE: OPPORTUNITIES
+  ═══════════════════════════════ -->
+  <div class="page" id="page-opportunities">
+    <div class="opp-layout">
+      <div class="list-pane">
+        <div class="page-title">Opportunities</div>
+        <div class="page-sub">34 opportunities · sorted by volume</div>
+        <div class="toolbar">
+          <button class="tb-btn active">All</button>
+          <button class="tb-btn">Under review</button>
+          <button class="tb-btn">On roadmap</button>
+          <div class="spacer"></div>
+          <button class="new-btn">+ New</button>
+        </div>
+        <div class="opp-card selected" data-opp="checkout">
+          <div class="opp-head"><span class="opp-title">Fix checkout payment failures</span><span class="status-pill s-new">Urgent</span></div>
+          <div class="opp-meta"><span class="meta-item">247 mentions</span><span class="meta-item">↑ 40% this week</span><div class="score-bar-wrap"><div class="score-bar" style="width:88%;background:#E24B4A"></div></div></div>
+        </div>
+        <div class="opp-card" data-opp="search">
+          <div class="opp-head"><span class="opp-title">Improve mobile search relevance</span><span class="status-pill s-review">Under review</span></div>
+          <div class="opp-meta"><span class="meta-item">189 mentions</span><span class="meta-item">3 weeks trending</span><div class="score-bar-wrap"><div class="score-bar" style="width:72%;background:#EF9F27"></div></div></div>
+        </div>
+        <div class="opp-card" data-opp="fees">
+          <div class="opp-head"><span class="opp-title">Clarify seller fee structure</span><span class="status-pill s-review">Under review</span></div>
+          <div class="opp-meta"><span class="meta-item">164 mentions</span><span class="meta-item">Spike post-pricing change</span><div class="score-bar-wrap"><div class="score-bar" style="width:65%;background:#EF9F27"></div></div></div>
+        </div>
+        <div class="opp-card" data-opp="photos">
+          <div class="opp-head"><span class="opp-title">Reduce photo upload failures</span><span class="status-pill s-road">On roadmap</span></div>
+          <div class="opp-meta"><span class="meta-item">121 mentions</span><span class="meta-item">Steady</span><div class="score-bar-wrap"><div class="score-bar" style="width:48%;background:#378ADD"></div></div></div>
+        </div>
+        <div class="opp-card" data-opp="watchlist">
+          <div class="opp-head"><span class="opp-title">Watchlist notification improvements</span><span class="status-pill s-review">Under review</span></div>
+          <div class="opp-meta"><span class="meta-item">97 mentions</span><span class="meta-item">Growing</span><div class="score-bar-wrap"><div class="score-bar" style="width:38%;background:#378ADD"></div></div></div>
+        </div>
+        <div class="opp-card" data-opp="messaging">
+          <div class="opp-head"><span class="opp-title">Better buyer–seller messaging UX</span><span class="status-pill s-road">On roadmap</span></div>
+          <div class="opp-meta"><span class="meta-item">74 mentions</span><span class="meta-item">Steady</span><div class="score-bar-wrap"><div class="score-bar" style="width:29%;background:#1D9E75"></div></div></div>
+        </div>
+      </div>
+      <div class="detail-pane" id="opp-detail">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       PAGE: FEEDBACK EXPLORER
+  ═══════════════════════════════ -->
+  <div class="page" id="page-feedback">
+    <div class="feedback-layout" id="feedbackLayout">
+      <div class="table-pane">
+        <div class="page-title">Feedback explorer</div>
+        <div class="page-sub">2,847 items · last 10 weeks · all sources</div>
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <div>
+              <div class="chart-panel-title">Theme trends</div>
+              <div class="chart-panel-sub">Weekly mention volume — click themes to toggle on/off</div>
+            </div>
+            <div class="theme-toggles" id="themeToggles"></div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <span class="filter-label">Filters</span>
+          <select class="filter-select"><option>All sources</option><option>Salesforce</option><option>CSAT</option><option>NPS</option><option>Slack</option></select>
+          <select class="filter-select"><option>All themes</option><option>Payments</option><option>Search</option><option>Fees</option><option>Photos</option></select>
+          <select class="filter-select"><option>All sentiment</option><option>Negative</option><option>Neutral</option><option>Positive</option></select>
+          <select class="filter-select"><option>Last 10 weeks</option><option>Last 30 days</option><option>Last 7 days</option></select>
+          <input class="search-input" type="text" placeholder="Search keywords…" />
+          <span class="saved-chip">Saved view ▾</span>
+          <span class="clear-btn">Clear all</span>
+        </div>
+        <div class="active-filters-row">
+          <span style="font-size:12px;color:var(--color-text-secondary)">Active filters:</span>
+          <span class="active-filter">Source: Salesforce ×</span>
+          <span class="active-filter">Theme: Payments ×</span>
+          <span class="active-filter">Sentiment: Negative ×</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Feedback</th><th>Source</th><th>Date</th><th>Sentiment</th><th>Themes</th><th>Opportunity</th></tr>
+          </thead>
+          <tbody id="feedbackTableBody">
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span>Showing 1–6 of 312</span>
+          <div style="display:flex;gap:6px"><button class="pg-btn">← Prev</button><button class="pg-btn">Next →</button></div>
+        </div>
+      </div>
+      <div class="drawer" id="feedbackDrawer">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       PAGE: AI ASSISTANT
+  ═══════════════════════════════ -->
+  <div class="page" id="page-ai-assistant">
+    <div class="chat-pane">
+      <div class="chat-header">
+        <div class="chat-title">AI Assistant</div>
+        <div class="chat-sub">Ask anything about your feedback data</div>
+      </div>
+      <div class="suggested">
+        <div class="sug-label">Suggested questions</div>
+        <span class="sug-pill" data-question="What are the top issues this week?">What are the top issues this week?</span>
+        <span class="sug-pill" data-question="What do sellers need most?">What do sellers need most?</span>
+        <span class="sug-pill" data-question="Any new trends emerging?">Any new trends emerging?</span>
+        <span class="sug-pill" data-question="Compare buyer vs seller pain points">Compare buyer vs seller pain points</span>
+      </div>
+      <div class="messages" id="chatMessages">
+        <div class="msg user">
+          <div class="avatar av-user">JR</div>
+          <div class="bubble bubble-user">What are the biggest issues buyers are facing right now?</div>
+        </div>
+        <div class="msg">
+          <div class="avatar av-ai">AI</div>
+          <div class="bubble bubble-ai">
+            Based on the last 30 days of feedback, here are the top buyer issues:<br><br>
+            <ol>
+              <li><strong>Checkout payment failures</strong> — 247 mentions, up 40% this week. Buyers are unable to complete purchases, primarily on mobile. Likely a recent regression.</li>
+              <li><strong>Search relevance on mobile</strong> — 189 mentions over 3 weeks. Buyers can't find what they're looking for; results feel irrelevant or out of order.</li>
+              <li><strong>Watchlist notifications</strong> — 97 mentions. Items selling without notification, or notifications arriving too late.</li>
+            </ol>
+            <div class="export-row">
+              <button class="export-btn">Export as PDF</button>
+              <button class="export-btn">Copy summary</button>
+              <button class="export-btn" data-goto="opportunities">Create opportunity →</button>
+            </div>
+          </div>
+        </div>
+        <div class="msg user">
+          <div class="avatar av-user">JR</div>
+          <div class="bubble bubble-user">Is the payment issue getting worse or stabilising?</div>
+        </div>
+        <div class="msg">
+          <div class="avatar av-ai">AI</div>
+          <div class="bubble bubble-ai">
+            It's getting worse. Mentions have increased each day for the past 5 days — from 18 on Monday to 61 yesterday. The spike correlates with a deployment on Tuesday. Salesforce cases account for 58% of this volume, suggesting buyers are actively seeking help rather than just venting.
+            <div class="export-row">
+              <button class="export-btn" data-goto="sizing">View sizing →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="input-row">
+        <textarea class="chat-input" id="chatInput" rows="1" placeholder="Ask about trends, themes, needs…"></textarea>
+        <button class="send-btn" id="chatSend">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       PAGE: SIZING
+  ═══════════════════════════════ -->
+  <div class="page" id="page-sizing">
+    <div class="main">
+      <div class="page-title">Opportunity sizing</div>
+      <div class="page-sub">Quantify impact before committing to build</div>
+      <div class="opp-selector">
+        <span class="sel-label">Opportunity</span>
+        <select class="opp-select" id="sizingSelect">
+          <option value="checkout">Fix checkout payment failures</option>
+          <option value="search">Improve mobile search relevance</option>
+          <option value="fees">Clarify seller fee structure</option>
+        </select>
+        <button class="action-btn">+ Compare</button>
+        <button class="action-btn" style="margin-left:auto">Create Canvas</button>
+      </div>
+      <div class="metrics metrics-5" id="sizingMetrics"></div>
+      <div class="grid-2-1" id="sizingCharts"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       PAGE: SOURCES
+  ═══════════════════════════════ -->
+  <div class="page" id="page-sources">
+    <div class="main">
+      <div class="page-title">Sources & settings</div>
+      <div class="page-sub">Manage data connections and your preferences</div>
+      <div class="tabs">
+        <div class="tab active">Data sources</div>
+        <div class="tab">Alerts</div>
+        <div class="tab">Saved views</div>
+        <div class="tab">Preferences</div>
+      </div>
+      <div class="section-label-sm">Connected sources</div>
+      <div class="source-card">
+        <div class="src-icon" style="background:#FCEBEB;color:#A32D2D">SF</div>
+        <div class="src-body">
+          <div class="src-name">Salesforce cases</div>
+          <div class="src-meta">1,204 items · Last synced 12 min ago · Cases tagged "product feedback" and "bug report"</div>
+          <div class="src-actions">
+            <span class="status-wrap"><div class="status-dot" style="background:#1D9E75"></div><span style="color:#3B6D11">Connected</span></span>
+            <button class="src-btn">Configure fields</button>
+            <button class="src-btn">Sync now</button>
+            <button class="src-btn">Disconnect</button>
+          </div>
+        </div>
+      </div>
+      <div class="source-card">
+        <div class="src-icon" style="background:#E6F1FB;color:#185FA5">CS</div>
+        <div class="src-body">
+          <div class="src-name">CSAT surveys</div>
+          <div class="src-meta">847 items · Last synced 1 hour ago · Score + verbatim responses</div>
+          <div class="src-actions">
+            <span class="status-wrap"><div class="status-dot" style="background:#1D9E75"></div><span style="color:#3B6D11">Connected</span></span>
+            <button class="src-btn">Configure fields</button>
+            <button class="src-btn">Sync now</button>
+            <button class="src-btn">Disconnect</button>
+          </div>
+        </div>
+      </div>
+      <div class="source-card">
+        <div class="src-icon" style="background:#FAEEDA;color:#854F0B">NPS</div>
+        <div class="src-body">
+          <div class="src-name">NPS responses</div>
+          <div class="src-meta">512 items · Last synced 2 hours ago · Detractor verbatims only</div>
+          <div class="src-actions">
+            <span class="status-wrap"><div class="status-dot" style="background:#EF9F27"></div><span style="color:#854F0B">Partial — 3 fields unmapped</span></span>
+            <button class="src-btn">Configure fields</button>
+            <button class="src-btn">Sync now</button>
+            <button class="src-btn">Disconnect</button>
+          </div>
+        </div>
+      </div>
+      <div class="source-card">
+        <div class="src-icon" style="background:#EAF3DE;color:#3B6D11">SL</div>
+        <div class="src-body">
+          <div class="src-name">Slack — #voc-feedback</div>
+          <div class="src-meta">284 items · Last synced 5 min ago · Monitoring 3 channels</div>
+          <div class="src-actions">
+            <span class="status-wrap"><div class="status-dot" style="background:#1D9E75"></div><span style="color:#3B6D11">Connected</span></span>
+            <button class="src-btn">Configure channels</button>
+            <button class="src-btn">Disconnect</button>
+          </div>
+        </div>
+      </div>
+      <div class="add-card">
+        <div class="src-icon" style="background:var(--color-background-secondary);color:var(--color-text-tertiary);font-size:18px">+</div>
+        <div class="add-text">Connect a new source — Intercom, Zendesk, survey tools, CSV upload…</div>
+      </div>
+      <div class="section-label-sm">Saved views</div>
+      <div class="saved-views">
+        <div class="view-row"><span class="view-name">My weekly seller issues</span><span class="view-meta">Feedback · Seller · Last 7 days</span><button class="view-btn">Load</button><button class="view-btn">Edit</button></div>
+        <div class="view-row"><span class="view-name">Payment & checkout topics</span><span class="view-meta">Feedback · Payments theme · All time</span><button class="view-btn">Load</button><button class="view-btn">Edit</button></div>
+        <div class="view-row"><span class="view-name">Urgent opportunity watch</span><span class="view-meta">Opportunities · Urgent · Score > 70</span><button class="view-btn">Load</button><button class="view-btn">Edit</button></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end shell -->
+
+<script>
+// ══════════════════════════════════
+// DATA
+// ══════════════════════════════════
+const oppData = {
+  checkout: {
+    title: 'Fix checkout payment failures',
+    sub: 'Auto-generated · Created 2 days ago',
+    stats: [{label:'Mentions',val:'247'},{label:'Trend',val:'↑ 40%',color:'#E24B4A'},{label:'Sources',val:'4'},{label:'Affected users',val:'~1.2k'}],
+    sources: [{name:'Salesforce',count:142},{name:'CSAT',count:61},{name:'NPS',count:28},{name:'Slack',count:16}],
+    tags: ['payments','checkout','buyers','critical'],
+    feedback: [
+      {source:'Salesforce case · 3 hours ago', text:'"My payment keeps failing at checkout, I\'ve tried 3 different cards and nothing works."'},
+      {source:'CSAT survey · Yesterday', text:'"Tried to buy twice and it wouldn\'t process — ended up going elsewhere."'},
+      {source:'NPS response · 2 days ago', text:'"Payment page seems broken on mobile. Very frustrating experience."'},
+    ]
+  },
+  search: {
+    title: 'Improve mobile search relevance',
+    sub: 'Auto-generated · Created 5 days ago',
+    stats: [{label:'Mentions',val:'189'},{label:'Trend',val:'↑ 12%',color:'#EF9F27'},{label:'Sources',val:'3'},{label:'Affected users',val:'~900'}],
+    sources: [{name:'CSAT',count:89},{name:'Salesforce',count:67},{name:'NPS',count:33}],
+    tags: ['search','mobile','buyers','relevance'],
+    feedback: [
+      {source:'CSAT survey · Yesterday', text:'"Search results on mobile are totally wrong — showing irrelevant listings."'},
+      {source:'Salesforce case · 2 days ago', text:'"Can\'t find what I\'m looking for on mobile. Desktop is fine."'},
+      {source:'NPS response · 3 days ago', text:'"Mobile search is terrible — I keep seeing listings from wrong categories."'},
+    ]
+  },
+  fees: {
+    title: 'Clarify seller fee structure',
+    sub: 'Auto-generated · Created 1 week ago',
+    stats: [{label:'Mentions',val:'164'},{label:'Trend',val:'↑ 8%',color:'#EF9F27'},{label:'Sources',val:'3'},{label:'Affected users',val:'~600'}],
+    sources: [{name:'NPS',count:82},{name:'Salesforce',count:55},{name:'Slack',count:27}],
+    tags: ['fees','sellers','billing','communications'],
+    feedback: [
+      {source:'NPS response · 2 days ago', text:'"I don\'t understand why my fees changed — no warning at all."'},
+      {source:'Salesforce case · 3 days ago', text:'"My listing fees doubled and I had no idea. Very unhappy."'},
+      {source:'Slack · 4 days ago', text:'"Can someone explain the new fee structure? Multiple sellers confused."'},
+    ]
+  },
+  photos: {
+    title: 'Reduce photo upload failures',
+    sub: 'Auto-generated · Created 2 weeks ago',
+    stats: [{label:'Mentions',val:'121'},{label:'Trend',val:'Steady',color:'#378ADD'},{label:'Sources',val:'2'},{label:'Affected users',val:'~480'}],
+    sources: [{name:'Salesforce',count:89},{name:'NPS',count:32}],
+    tags: ['photos','mobile','sellers','upload'],
+    feedback: [
+      {source:'Salesforce case · 3 days ago', text:'"Photo upload keeps failing on my iPhone — happens every single time."'},
+      {source:'NPS response · 5 days ago', text:'"Cannot upload photos for my listing. Very frustrating."'},
+    ]
+  },
+  watchlist: {
+    title: 'Watchlist notification improvements',
+    sub: 'Auto-generated · Created 10 days ago',
+    stats: [{label:'Mentions',val:'97'},{label:'Trend',val:'↑ 5%',color:'#378ADD'},{label:'Sources',val:'3'},{label:'Affected users',val:'~350'}],
+    sources: [{name:'CSAT',count:48},{name:'Salesforce',count:35},{name:'Slack',count:14}],
+    tags: ['watchlist','notifications','buyers'],
+    feedback: [
+      {source:'CSAT survey · 2 days ago', text:'"Item sold without notification. I was watching it for a week."'},
+      {source:'Salesforce case · 3 days ago', text:'"Watchlist notifications are hours late. Not useful."'},
+    ]
+  },
+  messaging: {
+    title: 'Better buyer–seller messaging UX',
+    sub: 'Auto-generated · Created 2 weeks ago',
+    stats: [{label:'Mentions',val:'74'},{label:'Trend',val:'Steady',color:'#1D9E75'},{label:'Sources',val:'2'},{label:'Affected users',val:'~260'}],
+    sources: [{name:'CSAT',count:51},{name:'NPS',count:23}],
+    tags: ['messaging','UX','buyers','sellers'],
+    feedback: [
+      {source:'CSAT survey · 4 days ago', text:'"Messaging interface is clunky. Hard to keep track of conversations."'},
+      {source:'NPS response · 1 week ago', text:'"Buyer messaging needs a proper inbox experience."'},
+    ]
+  }
+};
+
+const sizingData = {
+  checkout: {
+    metrics: [
+      {label:'Total mentions',value:'247',sub:'All sources · 30 days'},
+      {label:'Unique users',value:'~1,200',sub:'Est. from cases + survey'},
+      {label:'Mentions / day',value:'8.2',sub:'↑ 40% trend'},
+      {label:'Weeks trending',value:'1',sub:'Spiked this week'},
+      {label:'Priority score',value:'88',sub:'/ 100',color:'#E24B4A'}
+    ],
+    bars: [18,22,20,19,25,21,23,28,55,100],
+    segments: [{label:'Buyers',pct:82,color:'#378ADD'},{label:'Mobile users',pct:65,color:'#7F77DD'},{label:'New users',pct:41,color:'#1D9E75'},{label:'Sellers',pct:18,color:'#EF9F27'}],
+    sources: [{label:'Salesforce cases',val:142},{label:'CSAT responses',val:61},{label:'NPS verbatims',val:28},{label:'Slack mentions',val:16}]
+  },
+  search: {
+    metrics: [
+      {label:'Total mentions',value:'189',sub:'All sources · 30 days'},
+      {label:'Unique users',value:'~900',sub:'Est. from cases + survey'},
+      {label:'Mentions / day',value:'6.3',sub:'↑ 12% trend'},
+      {label:'Weeks trending',value:'3',sub:'Persistent theme'},
+      {label:'Priority score',value:'72',sub:'/ 100',color:'#EF9F27'}
+    ],
+    bars: [30,32,35,38,40,44,42,48,52,55],
+    segments: [{label:'Mobile buyers',pct:74,color:'#378ADD'},{label:'New users',pct:52,color:'#7F77DD'},{label:'Return buyers',pct:38,color:'#1D9E75'},{label:'Sellers',pct:9,color:'#EF9F27'}],
+    sources: [{label:'CSAT responses',val:89},{label:'Salesforce cases',val:67},{label:'NPS verbatims',val:33}]
+  },
+  fees: {
+    metrics: [
+      {label:'Total mentions',value:'164',sub:'All sources · 30 days'},
+      {label:'Unique users',value:'~600',sub:'Est. from NPS + cases'},
+      {label:'Mentions / day',value:'5.5',sub:'↑ 8% trend'},
+      {label:'Weeks trending',value:'2',sub:'Post pricing change'},
+      {label:'Priority score',value:'65',sub:'/ 100',color:'#EF9F27'}
+    ],
+    bars: [10,12,14,22,40,48,44,42,38,36],
+    segments: [{label:'Sellers',pct:88,color:'#378ADD'},{label:'Power sellers',pct:55,color:'#7F77DD'},{label:'New sellers',pct:31,color:'#1D9E75'},{label:'Buyers',pct:4,color:'#EF9F27'}],
+    sources: [{label:'NPS verbatims',val:82},{label:'Salesforce cases',val:55},{label:'Slack mentions',val:27}]
+  }
+};
+
+const feedbackRows = [
+  {text:'"Payment keeps failing at checkout — tried 3 cards and nothing works."', meta:'Case #48291 · Buyer', src:'sf', srcLabel:'Salesforce', date:'Today 9:14am', sent:'neg', themes:['payments','checkout'], opp:'Fix checkout failures', oppKey:'checkout',
+   drawer:{caseId:'#48291', date:'Today 9:14am', sentiment:'Negative', sentColor:'#A32D2D', userType:'Buyer', platform:'Mobile web', verbatim:'"Payment keeps failing at checkout — tried 3 cards and nothing works. Happened twice today. Very frustrating, I really wanted to buy this item."', tags:['payments','checkout','buyers','mobile'], oppLink:'Fix checkout payment failures', aiNote:'This matches 142 other Salesforce cases this month. The language around "tried multiple cards" is consistent with a payment gateway error rather than a card-specific issue — likely a systemic regression.'}},
+  {text:'"Payment page kept erroring out on my phone."', meta:'Case #48187 · Buyer', src:'sf', srcLabel:'Salesforce', date:'Today 7:52am', sent:'neg', themes:['payments','mobile'], opp:'Fix checkout failures', oppKey:'checkout',
+   drawer:{caseId:'#48187', date:'Today 7:52am', sentiment:'Negative', sentColor:'#A32D2D', userType:'Buyer', platform:'Mobile web', verbatim:'"Tried to purchase twice, payment page kept erroring out on my phone. Gave up after second attempt."', tags:['payments','mobile'], oppLink:'Fix checkout payment failures', aiNote:'Mobile-specific payment failure. Consistent with 65% of payment reports originating from mobile web users this week.'}},
+  {text:'"Why is it so hard to pay? This never happened before last week."', meta:'Case #48042 · Buyer', src:'sf', srcLabel:'Salesforce', date:'Yesterday', sent:'neg', themes:['payments'], opp:'Fix checkout failures', oppKey:'checkout',
+   drawer:{caseId:'#48042', date:'Yesterday', sentiment:'Negative', sentColor:'#A32D2D', userType:'Buyer', platform:'Desktop', verbatim:'"Why is it so hard to pay? This never happened before last week. Something must have changed."', tags:['payments','checkout'], oppLink:'Fix checkout payment failures', aiNote:'Customer explicitly notes the issue started last week — consistent with a deployment regression on Tuesday.'}},
+  {text:'"Search results on mobile are totally wrong — showing irrelevant listings."', meta:'Case #47901 · Buyer', src:'csat', srcLabel:'CSAT', date:'Yesterday', sent:'neg', themes:['search','mobile'], opp:'Mobile search relevance', oppKey:'search',
+   drawer:{caseId:'#47901', date:'Yesterday', sentiment:'Negative', sentColor:'#A32D2D', userType:'Buyer', platform:'Mobile app', verbatim:'"Search results on mobile are totally wrong — showing irrelevant listings from completely different categories."', tags:['search','mobile','relevance'], oppLink:'Improve mobile search relevance', aiNote:'One of 189 reports about mobile search relevance over the last 3 weeks. Pattern suggests algorithmic issue on mobile index.'}},
+  {text:'"I don\'t understand why my fees changed — no warning at all."', meta:'NPS #3821 · Seller', src:'nps', srcLabel:'NPS', date:'2 days ago', sent:'neg', themes:['fees','sellers'], opp:'Clarify fee structure', oppKey:'fees',
+   drawer:{caseId:'NPS #3821', date:'2 days ago', sentiment:'Negative', sentColor:'#A32D2D', userType:'Seller', platform:'Desktop', verbatim:'"I don\'t understand why my fees changed — no warning at all. I only noticed because my payout was lower than expected."', tags:['fees','sellers','billing'], oppLink:'Clarify seller fee structure', aiNote:'Fee confusion spike correlates with pricing update 10 days ago. 88% of fee-related feedback comes from sellers active for >6 months.'}},
+  {text:'"Photo upload keeps failing on my iPhone — happens every single time."', meta:'Case #47455 · Seller', src:'sf', srcLabel:'Salesforce', date:'3 days ago', sent:'neg', themes:['photos','mobile'], opp:'Photo upload failures', oppKey:'photos',
+   drawer:{caseId:'#47455', date:'3 days ago', sentiment:'Negative', sentColor:'#A32D2D', userType:'Seller', platform:'iOS app', verbatim:'"Photo upload keeps failing on my iPhone — happens every single time. I have to use the desktop site instead which is annoying."', tags:['photos','mobile','upload'], oppLink:'Reduce photo upload failures', aiNote:'iOS-specific photo upload failure is the primary variant. Likely related to iOS 17.x file permission changes.'}},
+];
+
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
+function navigate(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + pageId);
+  if (page) page.classList.add('active');
+  document.querySelectorAll('.nav-item[data-page="' + pageId + '"]').forEach(n => n.classList.add('active'));
+  if (pageId === 'feedback') {
+    setTimeout(initFeedbackChart, 50);
+  }
+  if (pageId === 'sizing') {
+    renderSizing(document.getElementById('sizingSelect').value);
+  }
+}
+
+document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+  item.addEventListener('click', () => navigate(item.dataset.page));
+});
+
+// Go-to links anywhere
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-goto]');
+  if (btn) navigate(btn.dataset.goto);
+  const spark = e.target.closest('[data-goto]');
+});
+
+// Also spark rows
+document.querySelectorAll('.spark-row[data-goto]').forEach(row => {
+  row.addEventListener('click', () => navigate(row.dataset.goto));
+});
+
+// ══════════════════════════════════
+// OPPORTUNITIES
+// ══════════════════════════════════
+function renderOppDetail(key) {
+  const d = oppData[key];
+  const detail = document.getElementById('opp-detail');
+  detail.innerHTML = `
+    <div class="detail-title">${d.title}</div>
+    <div class="detail-sub">${d.sub}</div>
+    <div class="stat-row">
+      ${d.stats.map(s => `<div class="stat-box"><div class="stat-label">${s.label}</div><div class="stat-val" style="${s.color?'color:'+s.color:''}">${s.val}</div></div>`).join('')}
+    </div>
+    <div class="section-label" style="margin-bottom:6px">Sources</div>
+    <div style="margin-bottom:1rem">${d.sources.map(s => `<span class="source-chip">${s.name} (${s.count})</span>`).join('')}</div>
+    <div class="section-label">Tags</div>
+    <div class="tag-row">${d.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    <div class="section-label">Sample feedback</div>
+    ${d.feedback.map(f => `<div class="feedback-item"><div class="fb-source">${f.source}</div><div class="fb-text">${f.text}</div></div>`).join('')}
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <span class="action-link" data-goto="feedback">View all feedback →</span>
+      <span class="action-link" data-goto="sizing" style="margin-left:8px">Size this opportunity →</span>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="act-btn act-btn-primary">Create Canvas</button>
+      <button class="act-btn">Create Jira issue</button>
+    </div>
+  `;
+}
+
+document.querySelectorAll('.opp-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.opp-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    renderOppDetail(card.dataset.opp);
+  });
+});
+
+renderOppDetail('checkout');
+
+// ══════════════════════════════════
+// FEEDBACK TABLE + DRAWER
+// ══════════════════════════════════
+let activeDrawerRow = null;
+
+function renderFeedbackTable() {
+  const tbody = document.getElementById('feedbackTableBody');
+  tbody.innerHTML = feedbackRows.map((row, i) => `
+    <tr data-idx="${i}" class="${i===0?'selected':''}">
+      <td><div class="cell-text">${row.text}</div><div class="cell-meta">${row.meta}</div></td>
+      <td><span class="source-badge src-${row.src}">${row.srcLabel}</span></td>
+      <td style="white-space:nowrap;color:var(--color-text-secondary)">${row.date}</td>
+      <td><span class="sentiment sent-${row.sent}">${row.sent==='neg'?'Negative':row.sent==='pos'?'Positive':'Neutral'}</span></td>
+      <td>${row.themes.map(t=>`<span class="theme-tag">${t}</span>`).join('')}</td>
+      <td><span class="opp-link" data-opp="${row.oppKey}">${row.opp}</span></td>
+    </tr>
+  `).join('');
+
+  tbody.querySelectorAll('tr').forEach(tr => {
+    tr.addEventListener('click', (e) => {
+      // If clicking opp link, navigate to opportunities
+      const oppLink = e.target.closest('.opp-link');
+      if (oppLink) {
+        navigate('opportunities');
+        // select the right opp card
+        document.querySelectorAll('.opp-card').forEach(c => {
+          c.classList.toggle('selected', c.dataset.opp === oppLink.dataset.opp);
+        });
+        renderOppDetail(oppLink.dataset.opp);
+        return;
+      }
+      tbody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+      tr.classList.add('selected');
+      renderDrawer(parseInt(tr.dataset.idx));
+    });
+  });
+}
+
+function renderDrawer(idx) {
+  const row = feedbackRows[idx];
+  const d = row.drawer;
+  const drawer = document.getElementById('feedbackDrawer');
+  drawer.classList.remove('hidden');
+  document.getElementById('feedbackLayout').classList.remove('no-drawer');
+  drawer.innerHTML = `
+    <div class="drawer-header">
+      <div class="drawer-title">${row.text}</div>
+      <button class="close-btn" id="closeDrawer">×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="meta-grid">
+        <div class="meta-box"><div class="meta-label">Source</div><div class="meta-val" style="color:#A32D2D">${row.srcLabel} case</div></div>
+        <div class="meta-box"><div class="meta-label">Case ID</div><div class="meta-val">${d.caseId}</div></div>
+        <div class="meta-box"><div class="meta-label">Date</div><div class="meta-val">${d.date}</div></div>
+        <div class="meta-box"><div class="meta-label">Sentiment</div><div class="meta-val" style="color:${d.sentColor}">${d.sentiment}</div></div>
+        <div class="meta-box"><div class="meta-label">User type</div><div class="meta-val">${d.userType}</div></div>
+        <div class="meta-box"><div class="meta-label">Platform</div><div class="meta-val">${d.platform}</div></div>
+      </div>
+      <div class="drawer-section">Verbatim</div>
+      <div class="verbatim-box">${d.verbatim}</div>
+      <div class="drawer-section">Themes</div>
+      <div style="margin-bottom:1.25rem">
+        ${d.tags.map(t=>`<span class="tag">${t}</span>`).join('')}
+        <span class="tag tag-dashed">+ add tag</span>
+      </div>
+      <div class="drawer-section">Linked opportunity</div>
+      <div class="opp-link-row" data-opp="${row.oppKey}">
+        <div class="opp-link-name">${d.oppLink}</div>
+        <span class="opp-pill">Urgent</span>
+      </div>
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:1.25rem">247 mentions · ↑ 40% this week</div>
+      <div class="drawer-section">AI insight</div>
+      <div class="ai-suggest">
+        <div class="ai-suggest-label">AI note</div>
+        ${d.aiNote}
+      </div>
+      <div class="action-row">
+        <button class="act-btn">Copy verbatim</button>
+        <button class="act-btn">Link to opportunity</button>
+        <button class="act-btn">Flag for review</button>
+        <button class="act-btn act-btn-primary">View in Salesforce →</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('closeDrawer').addEventListener('click', () => {
+    drawer.classList.add('hidden');
+    document.getElementById('feedbackLayout').classList.add('no-drawer');
+  });
+
+  drawer.querySelector('.opp-link-row').addEventListener('click', () => {
+    navigate('opportunities');
+    document.querySelectorAll('.opp-card').forEach(c => {
+      c.classList.toggle('selected', c.dataset.opp === row.oppKey);
+    });
+    renderOppDetail(row.oppKey);
+  });
+}
+
+renderFeedbackTable();
+renderDrawer(0);
+
+// ══════════════════════════════════
+// FEEDBACK CHART
+// ══════════════════════════════════
+const weeks = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10'];
+const themes = [
+  { label:'Payments',  color:'#E24B4A', bg:'#FCEBEB', text:'#A32D2D', data:[18,22,19,21,24,28,31,38,61,87], active:true  },
+  { label:'Search',    color:'#378ADD', bg:'#E6F1FB', text:'#185FA5', data:[30,32,35,38,40,44,42,48,52,55], active:true  },
+  { label:'Fees',      color:'#EF9F27', bg:'#FAEEDA', text:'#854F0B', data:[10,12,14,22,40,48,44,42,38,36], active:true  },
+  { label:'Photos',    color:'#7F77DD', bg:'#EEEDFE', text:'#3C3489', data:[25,27,24,26,28,30,32,31,29,28], active:false },
+  { label:'Watchlist', color:'#1D9E75', bg:'#EAF3DE', text:'#3B6D11', data:[12,14,15,17,18,20,22,24,26,28], active:false }
+];
+let trendChart = null;
+
+function buildToggles() {
+  const container = document.getElementById('themeToggles');
+  if (!container) return;
+  container.innerHTML = '';
+  themes.forEach(t => {
+    const btn = document.createElement('div');
+    btn.className = 'theme-toggle' + (t.active ? '' : ' inactive');
+    if (t.active) { btn.style.background = t.bg; btn.style.borderColor = t.color; btn.style.color = t.text; }
+    btn.innerHTML = '<div class="theme-toggle-dot" style="background:' + t.color + '"></div>' + t.label;
+    btn.addEventListener('click', () => { t.active = !t.active; buildToggles(); updateTrendChart(); });
+    container.appendChild(btn);
+  });
+}
+
+function getDatasets() {
+  return themes.filter(t => t.active).map(t => ({
+    label: t.label, data: t.data, borderColor: t.color, backgroundColor: t.color + '15',
+    borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, pointBackgroundColor: t.color,
+    pointBorderColor: '#fff', pointBorderWidth: 1.5, tension: 0.35, fill: false
+  }));
+}
+
+function initFeedbackChart() {
+  const canvas = document.getElementById('trendChart');
+  if (!canvas) return;
+  if (trendChart) { trendChart.destroy(); trendChart = null; }
+  buildToggles();
+  const ctx = canvas.getContext('2d');
+  trendChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: weeks, datasets: getDatasets() },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#ffffff', borderColor: 'rgba(0,0,0,0.12)', borderWidth: 1,
+          titleColor: '#1a1a1a', titleFont: { size: 12, weight: '500' },
+          bodyColor: '#6b6b6b', bodyFont: { size: 12 }, padding: 10,
+          callbacks: { label: ctx => '  ' + ctx.dataset.label + ': ' + ctx.parsed.y + ' mentions' }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.05)', drawTicks: false }, ticks: { font: { size: 11 }, color: '#9b9b9b', padding: 6 }, border: { display: false } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)', drawTicks: false }, ticks: { font: { size: 11 }, color: '#9b9b9b', padding: 6, stepSize: 20 }, border: { display: false }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+function updateTrendChart() {
+  if (trendChart) { trendChart.data.datasets = getDatasets(); trendChart.update(); }
+}
+
+// ══════════════════════════════════
+// SIZING
+// ══════════════════════════════════
+function renderSizing(key) {
+  const d = sizingData[key];
+  if (!d) return;
+
+  const metricsEl = document.getElementById('sizingMetrics');
+  metricsEl.innerHTML = d.metrics.map(m => `
+    <div class="metric">
+      <div class="metric-label">${m.label}</div>
+      <div class="metric-value" style="${m.color?'color:'+m.color:''}">${m.value}</div>
+      <div class="metric-sub">${m.sub}</div>
+    </div>
+  `).join('');
+
+  const maxBar = Math.max(...d.bars);
+  const chartsEl = document.getElementById('sizingCharts');
+  chartsEl.innerHTML = `
+    <div class="card">
+      <div class="card-title">Mention trend — last 10 weeks</div>
+      <div class="trend-chart">
+        ${d.bars.map((b,i) => {
+          const pct = Math.round((b/maxBar)*100);
+          const colors = ['#B5D4F4','#B5D4F4','#85B7EB','#85B7EB','#85B7EB','#378ADD','#378ADD','#378ADD','#185FA5','#E24B4A'];
+          return `<div class="t-bar" style="height:${pct}%;background:${colors[i]}"></div>`;
+        }).join('')}
+      </div>
+      <div class="chart-labels">${['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10'].map(w=>`<div class="chart-label">${w}</div>`).join('')}</div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title">Affected segments</div>
+        ${d.segments.map(s => `
+          <div class="seg-row">
+            <span class="seg-label">${s.label}</span>
+            <div class="seg-bar-wrap"><div class="seg-bar" style="width:${s.pct}%;background:${s.color}"></div></div>
+            <span class="seg-pct">${s.pct}%</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="card">
+        <div class="card-title">Frequency by source</div>
+        ${d.sources.map(s => `<div class="freq-row"><span class="freq-label">${s.label}</span><span class="freq-val">${s.val}</span></div>`).join('')}
+        <div class="confidence">
+          <span style="font-size:12px;color:#854F0B">Confidence</span>
+          <div class="conf-dots">
+            ${[1,2,3,4,5].map(n=>`<div class="conf-dot" style="background:${n<=4?'#EF9F27':'#f5f5f3'}"></div>`).join('')}
+          </div>
+          <span style="font-size:11px;color:#854F0B">High (${d.sources.length} sources)</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('sizingSelect').addEventListener('change', function() {
+  renderSizing(this.value);
+});
+
+// ══════════════════════════════════
+// AI ASSISTANT — CHAT INTERACTIONS
+// ══════════════════════════════════
+const canned = {
+  'What are the top issues this week?': 'This week\'s top issues are: (1) <strong>Checkout payment failures</strong> — 247 mentions, spiked 40% since Tuesday\'s deployment. (2) <strong>Mobile search relevance</strong> — 189 mentions, 3 weeks persistent. (3) <strong>Seller fee confusion</strong> — 164 mentions following the pricing change.',
+  'What do sellers need most?': 'Sellers\' top needs right now: (1) <strong>Fee structure clarity</strong> — 164 mentions, spike post-pricing change. (2) <strong>Photo upload fix</strong> — 121 mentions, iPhone users most affected. (3) <strong>Better messaging UX</strong> — 74 mentions, difficulty tracking buyer conversations.',
+  'Any new trends emerging?': 'Two new patterns detected this week: (1) <strong>Listing draft lost</strong> — 23 mentions in the last 48 hours, sellers losing work mid-edit. This is new and worth monitoring. (2) <strong>Payment method management</strong> — buyers struggling to update saved cards, 18 mentions.',
+  'Compare buyer vs seller pain points': 'Key differences: <strong>Buyers</strong> are most impacted by payment failures (247) and search relevance (189). <strong>Sellers</strong> are most impacted by fee confusion (164) and photo upload failures (121). Both segments report issues with messaging UX. Buyer sentiment is lower this week (58% positive vs 67% last week).',
+};
+
+function addMessage(role, html) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg' + (role === 'user' ? ' user' : '');
+  div.innerHTML = `
+    <div class="avatar ${role==='user'?'av-user':'av-ai'}">${role==='user'?'JR':'AI'}</div>
+    <div class="bubble ${role==='user'?'bubble-user':'bubble-ai'}">${html}</div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+document.querySelectorAll('.sug-pill[data-question]').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const q = pill.dataset.question;
+    addMessage('user', q);
+    setTimeout(() => {
+      const ans = canned[q] || 'Let me look into that across your feedback sources…';
+      addMessage('ai', ans);
+    }, 600);
+  });
+});
+
+document.getElementById('chatSend').addEventListener('click', sendChat);
+document.getElementById('chatInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const val = input.value.trim();
+  if (!val) return;
+  addMessage('user', val);
+  input.value = '';
+  setTimeout(() => {
+    addMessage('ai', 'I\'ve searched across all your feedback sources. Based on the last 30 days, I can see patterns related to your question. Would you like me to create an opportunity from this data, or dig deeper into a specific source?<div class="export-row"><button class="export-btn" data-goto="opportunities">Create opportunity →</button><button class="export-btn" data-goto="feedback">View raw feedback →</button></div>');
+  }, 700);
+}
+
+// Export buttons in existing chat bubbles
+document.querySelectorAll('.export-btn[data-goto]').forEach(btn => {
+  btn.addEventListener('click', () => navigate(btn.dataset.goto));
+});
+
+// ══════════════════════════════════
+// SOURCES PAGE TABS
+// ══════════════════════════════════
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+
+</script>
+</body>
+</html>
