@@ -387,14 +387,14 @@ body { background: var(--color-background-tertiary) !important; font-family: var
       <div class="page-title">Dashboard</div>
       <div class="page-sub">Last 30 days · All sources</div>
       <div class="metrics metrics-4">
-        <div class="metric"><div class="metric-label">Total feedback</div><div class="metric-value">2,960</div><div class="metric-delta delta-up">↑ 14% vs last month</div></div>
-        <div class="metric"><div class="metric-label">Open opportunities</div><div class="metric-value">34</div><div class="metric-delta delta-up">↑ 6 new this week</div></div>
+        <div class="metric"><div class="metric-label">Total feedback</div><div class="metric-value">2,847</div><div class="metric-delta delta-up">↑ 14% vs last month</div></div>
+        <div class="metric"><div class="metric-label">Open opportunities</div><div class="metric-value">40</div><div class="metric-delta delta-up">↑ 6 new from B2B data</div></div>
         <div class="metric"><div class="metric-label">Trending themes</div><div class="metric-value">8</div><div class="metric-delta delta-up">↑ 3 since yesterday</div></div>
         <div class="metric"><div class="metric-label">Avg sentiment</div><div class="metric-value">62%</div><div class="metric-delta delta-down">↓ 4% vs last month</div></div>
       </div>
       <div class="ai-box">
         <div class="ai-label">AI summary</div>
-        <div class="ai-text">Top issues this week: <strong>checkout payment failures</strong> (up 40%), <strong>search relevance on mobile</strong> (persistent, 3 weeks), and <strong>seller fee confusion</strong> after recent pricing changes. Recommend reviewing checkout error logs and the seller comms flow.</div>
+        <div class="ai-text">Top issues this week: <strong>checkout payment failures</strong> (up 40%), <strong>search relevance on mobile</strong> (persistent, 3 weeks), and <strong>seller fee confusion</strong> after recent pricing changes. New from B2B data: <strong>"unless sold prior" legal compliance</strong> is urgent (REAA risk), and <strong>Watchlist Connect reporting</strong> has 18 agent requests across 10+ agencies.</div>
       </div>
       <div class="grid-2-1">
         <div>
@@ -406,6 +406,9 @@ body { background: var(--color-background-tertiary) !important; font-family: var
             <div class="spark-row" data-goto="opportunities"><span class="spark-label">Photo upload errors</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:48%;background:#378ADD"></div></div><span class="spark-count">121</span></div>
             <div class="spark-row" data-goto="opportunities"><span class="spark-label">Watch list notifications</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:38%;background:#378ADD"></div></div><span class="spark-count">97</span></div>
             <div class="spark-row" data-goto="opportunities"><span class="spark-label">Buyer messaging UX</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:29%;background:#1D9E75"></div></div><span class="spark-count">74</span></div>
+            <div class="spark-row" data-goto="opportunities"><span class="spark-label">⚑ Legal: "unless sold prior" wording</span><span class="trend-chip" style="background:#FCEBEB;color:#A32D2D">Urgent</span><div class="spark-bar-wrap" style="margin-left:8px"><div class="spark-bar" style="width:90%;background:#E24B4A"></div></div><span class="spark-count">3</span></div>
+            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Watchlist Connect reporting (B2B)</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:72%;background:#EF9F27"></div></div><span class="spark-count">18</span></div>
+            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Reporting automation (B2B)</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:60%;background:#EF9F27"></div></div><span class="spark-count">15</span></div>
           </div>
           <div class="card">
             <div class="card-title">Feedback volume — last 7 days</div>
@@ -449,7 +452,7 @@ body { background: var(--color-background-tertiary) !important; font-family: var
     <div class="opp-layout">
       <div class="list-pane">
         <div class="page-title">Opportunities</div>
-        <div class="page-sub">34 opportunities · sorted by volume</div>
+        <div class="page-sub">40 opportunities · sorted by volume</div>
         <div class="toolbar">
           <button class="tb-btn active">All</button>
           <button class="tb-btn">Under review</button>
@@ -481,6 +484,33 @@ body { background: var(--color-background-tertiary) !important; font-family: var
           <div class="opp-head"><span class="opp-title">Better buyer–seller messaging UX</span><span class="status-pill s-road">On roadmap</span></div>
           <div class="opp-meta"><span class="meta-item">74 mentions</span><span class="meta-item">Steady</span><div class="score-bar-wrap"><div class="score-bar" style="width:29%;background:#1D9E75"></div></div></div>
         </div>
+
+        <div style="font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.06em;padding:0.75rem 0 0.25rem">From B2B feedback</div>
+
+        <div class="opp-card" data-opp="legalCompliance">
+          <div class="opp-head"><span class="opp-title">"Unless sold prior" legal compliance</span><span class="status-pill s-new">Urgent</span></div>
+          <div class="opp-meta"><span class="meta-item">3 B2B requests</span><span class="meta-item">Legal / REAA risk</span><div class="score-bar-wrap"><div class="score-bar" style="width:90%;background:#E24B4A"></div></div></div>
+        </div>
+        <div class="opp-card" data-opp="watchlistConnect">
+          <div class="opp-head"><span class="opp-title">Watchlist Connect — sold data & reporting</span><span class="status-pill s-review">Under review</span></div>
+          <div class="opp-meta"><span class="meta-item">18 B2B requests</span><span class="meta-item">10+ agencies</span><div class="score-bar-wrap"><div class="score-bar" style="width:82%;background:#EF9F27"></div></div></div>
+        </div>
+        <div class="opp-card" data-opp="reportingAutomation">
+          <div class="opp-head"><span class="opp-title">Reporting automation & bulk export</span><span class="status-pill s-review">Under review</span></div>
+          <div class="opp-meta"><span class="meta-item">15 B2B requests</span><span class="meta-item">Competitive gap</span><div class="score-bar-wrap"><div class="score-bar" style="width:76%;background:#EF9F27"></div></div></div>
+        </div>
+        <div class="opp-card" data-opp="multiAgentEnquiry">
+          <div class="opp-head"><span class="opp-title">Multi-agent enquiry routing</span><span class="status-pill s-review">Under review</span></div>
+          <div class="opp-meta"><span class="meta-item">5+ B2B requests</span><span class="meta-item">Multiple agencies</span><div class="score-bar-wrap"><div class="score-bar" style="width:71%;background:#EF9F27"></div></div></div>
+        </div>
+        <div class="opp-card" data-opp="findAnAgentAccuracy">
+          <div class="opp-head"><span class="opp-title">Fix Find an Agent suburb accuracy</span><span class="status-pill s-review">Under review</span></div>
+          <div class="opp-meta"><span class="meta-item">5 B2B requests</span><span class="meta-item">RW, Harcourts, Tommy's</span><div class="score-bar-wrap"><div class="score-bar" style="width:68%;background:#EF9F27"></div></div></div>
+        </div>
+        <div class="opp-card" data-opp="listingCategoryFlexibility">
+          <div class="opp-head"><span class="opp-title">Listing category flexibility</span><span class="status-pill s-road">On roadmap</span></div>
+          <div class="opp-meta"><span class="meta-item">8 B2B requests</span><span class="meta-item">Competitive gap</span><div class="score-bar-wrap"><div class="score-bar" style="width:65%;background:#378ADD"></div></div></div>
+        </div>
       </div>
       <div class="detail-pane" id="opp-detail">
         <!-- filled by JS -->
@@ -495,7 +525,7 @@ body { background: var(--color-background-tertiary) !important; font-family: var
     <div class="feedback-layout" id="feedbackLayout">
       <div class="table-pane">
         <div class="page-title">Feedback explorer</div>
-        <div class="page-sub">2,960 items · last 10 weeks · all sources — including 113 real B2B suggestions</div>
+        <div class="page-sub">2,847 items · last 10 weeks · all sources</div>
         <div class="chart-panel">
           <div class="chart-panel-header">
             <div>
@@ -510,8 +540,8 @@ body { background: var(--color-background-tertiary) !important; font-family: var
         </div>
         <div class="filter-bar">
           <span class="filter-label">Filters</span>
-          <select class="filter-select"><option>All sources</option><option>Salesforce</option><option>CSAT</option><option>NPS</option><option>Slack</option><option>Slack B2B</option></select>
-          <select class="filter-select"><option>All themes</option><option>Payments</option><option>Search</option><option>Fees</option><option>Photos</option><option>Watchlist</option><option>Reporting</option><option>OneHub</option><option>Enquiry/Agents</option><option>Categories</option><option>Find an Agent</option></select>
+          <select class="filter-select"><option>All sources</option><option>Salesforce</option><option>CSAT</option><option>NPS</option><option>Slack</option></select>
+          <select class="filter-select"><option>All themes</option><option>Payments</option><option>Search</option><option>Fees</option><option>Photos</option></select>
           <select class="filter-select"><option>All sentiment</option><option>Negative</option><option>Neutral</option><option>Positive</option></select>
           <select class="filter-select"><option>Last 10 weeks</option><option>Last 30 days</option><option>Last 7 days</option></select>
           <input class="search-input" type="text" placeholder="Search keywords…" />
@@ -532,7 +562,7 @@ body { background: var(--color-background-tertiary) !important; font-family: var
           </tbody>
         </table>
         <div class="pagination">
-          <span>Showing 1–10 of 119 (real B2B) + 2,841 (other sources)</span>
+          <span>Showing 1–6 of 312</span>
           <div style="display:flex;gap:6px"><button class="pg-btn">← Prev</button><button class="pg-btn">Next →</button></div>
         </div>
       </div>
@@ -561,9 +591,9 @@ body { background: var(--color-background-tertiary) !important; font-family: var
       <div class="suggested">
         <div class="sug-label">Suggested questions</div>
         <span class="sug-pill" data-question="What are the top issues this week?">What are the top issues this week?</span>
-        <span class="sug-pill" data-question="What are agents asking for most in the B2B feedback?">Top B2B agent requests?</span>
+        <span class="sug-pill" data-question="What do sellers need most?">What do sellers need most?</span>
         <span class="sug-pill" data-question="Any new trends emerging?">Any new trends emerging?</span>
-        <span class="sug-pill" data-question="What should we prioritise for Watchlist Connect?">Watchlist Connect priorities?</span>
+        <span class="sug-pill" data-question="Compare buyer vs seller pain points">Compare buyer vs seller pain points</span>
       </div>
       <div class="messages" id="chatMessages">
         <div class="msg user">
@@ -690,18 +720,6 @@ body { background: var(--color-background-tertiary) !important; font-family: var
           <div class="src-actions">
             <span class="status-wrap"><div class="status-dot" style="background:#1D9E75"></div><span style="color:#3B6D11">Connected</span></span>
             <button class="src-btn">Configure channels</button>
-            <button class="src-btn">Disconnect</button>
-          </div>
-        </div>
-      </div>
-      <div class="source-card">
-        <div class="src-icon" style="background:#ECF9F0;color:#1A6B3A">B2B</div>
-        <div class="src-body">
-          <div class="src-name">Slack — #b2b-suggestions <span style="font-size:11px;background:#D1F4E0;color:#1A6B3A;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:400">Real data</span></div>
-          <div class="src-meta">113 items · Nov 2024 – Mar 2026 · Agent & agency feedback via TM account managers</div>
-          <div class="src-actions">
-            <span class="status-wrap"><div class="status-dot" style="background:#1D9E75"></div><span style="color:#3B6D11">Connected</span></span>
-            <button class="src-btn">Configure</button>
             <button class="src-btn">Disconnect</button>
           </div>
         </div>
@@ -936,6 +954,121 @@ const oppData = {
       {source:'CSAT survey · 4 days ago', text:'"Messaging interface is clunky. Hard to keep track of conversations."'},
       {source:'NPS response · 1 week ago', text:'"Buyer messaging needs a proper inbox experience."'},
     ]
+  },
+
+  // ── B2B-derived opportunities ─────────────────────────────────────────────
+
+  watchlistConnect: {
+    title: 'Watchlist Connect — sold data & report enhancements',
+    sub: 'From Slack B2B · 18 requests across 10+ agencies · Nov 2024–Dec 2025',
+    stats: [
+      {label:'B2B requests',val:'18',color:'#1A6B3A'},
+      {label:'Trend',val:'Persistent',color:'#EF9F27'},
+      {label:'Agencies',val:'10+'},
+      {label:'Priority score',val:'82',color:'#EF9F27'}
+    ],
+    sources: [{name:'Slack B2B',count:18},{name:'Account managers',count:7}],
+    tags: ['watchlist','reporting','sold-data','agents','vendor-conversations'],
+    feedback: [
+      {source:'Slack B2B · Harcourts Hawke\'s Bay · Dec 2025', text:'More insights on watchlist report — add recently sold listings with shared watchers and date-stamp report'},
+      {source:'Slack B2B · Harcourts Hawke\'s Bay · May 2025', text:'Add recent sold data to Watchlist Report showing listings the current listing\'s watchers also had'},
+      {source:'Slack B2B · Zani Polson · Nov 2025', text:'Watchlist Sold Report — like Watchlist Interest but showing top 6 properties just sold with shared watchers'},
+      {source:'Slack B2B · LJ Hooker Waihi Beach · Feb 2026', text:'Clarify watchlist number on listing — all time vs current causing vendor complaints of false advertising'},
+    ]
+  },
+
+  reportingAutomation: {
+    title: 'Reporting automation & bulk export',
+    sub: 'From Slack B2B · 15 requests · Competitive gap — "competitors already offer this"',
+    stats: [
+      {label:'B2B requests',val:'15',color:'#1A6B3A'},
+      {label:'Trend',val:'↑ Growing',color:'#E24B4A'},
+      {label:'Agencies',val:'12+'},
+      {label:'Priority score',val:'76',color:'#EF9F27'}
+    ],
+    sources: [{name:'Slack B2B',count:15},{name:'Account managers',count:6}],
+    tags: ['reporting','automation','scheduling','export','vendor-reports'],
+    feedback: [
+      {source:'Slack B2B · Jeremy Leighton · Jul 2025', text:'Marketing report automation — schedule vendor marketing reports instead of manually creating them. Competitors already offer this.'},
+      {source:'Slack B2B · Dave Malkin · Dec 2025', text:'Ability to download multiple vendor/watchlist reports at once rather than individually'},
+      {source:'Slack B2B · Shane Premraj · Nov 2024', text:'Auto-send/schedule weekly listing performance report to agents from OneHub'},
+      {source:'Slack B2B · Nicole Gillies · Oct 2025', text:'Share rental insights report data as a CSV file — currently low adoption as PMs don\'t have individual logins'},
+    ]
+  },
+
+  multiAgentEnquiry: {
+    title: 'Multi-agent enquiry routing',
+    sub: 'From Slack B2B · 5+ requests · Multiple major agencies · Sep 2025–Feb 2026',
+    stats: [
+      {label:'B2B requests',val:'5+',color:'#1A6B3A'},
+      {label:'Trend',val:'Recurring',color:'#EF9F27'},
+      {label:'Agencies',val:'5+'},
+      {label:'Priority score',val:'71',color:'#EF9F27'}
+    ],
+    sources: [{name:'Slack B2B',count:6},{name:'Account managers',count:4}],
+    tags: ['enquiry','co-listing','agents','leads','routing'],
+    feedback: [
+      {source:'Slack B2B · Anna Bloomfield · Sep 2025', text:'Enquiry should go to both lead and secondary agent, not just lead — won\'t miss enquiries if lead agent is away'},
+      {source:'Slack B2B · Karen Martin · Sep 2025', text:'Send email enquiry to both agents on a listing — 2nd agent often responsible for follow-up'},
+      {source:'Slack B2B · Jon Allison · Feb 2026', text:'Allow agent to choose which agent receives enquiries on a shared listing'},
+      {source:'Slack B2B · Jon Allison · Oct 2025', text:'Both lead and secondary agents to be notified with reports and email enquiries — Bayleys work with multiple team members'},
+    ]
+  },
+
+  findAnAgentAccuracy: {
+    title: 'Fix Find an Agent — suburb-specific accuracy',
+    sub: 'From Slack B2B · 5 requests across competing major agencies · Jun 2025–Mar 2026',
+    stats: [
+      {label:'B2B requests',val:'5',color:'#1A6B3A'},
+      {label:'Trend',val:'Persistent',color:'#EF9F27'},
+      {label:'Agencies',val:'RW, Harcourts, Tommy\'s, B&T'},
+      {label:'Priority score',val:'68',color:'#EF9F27'}
+    ],
+    sources: [{name:'Slack B2B',count:5},{name:'Account managers',count:3}],
+    tags: ['find-an-agent','accuracy','suburb','credibility','agents'],
+    feedback: [
+      {source:'Slack B2B · Dave Malkin · Jun 2025', text:'Change Find an Agent logic — currently promoting agents who\'ve never sold in the suburb. Should match Homes.co.nz.'},
+      {source:'Slack B2B · Dave Malkin · Jun 2025', text:'Find an Agent not recommending right agents per suburb — using total performance not suburb-specific'},
+      {source:'Slack B2B · Karen Martin · Mar 2026', text:'Find an Agent — agents featuring at top of suburb without having sold a property there'},
+      {source:'Slack B2B · Nimish Tanna · Apr 2025', text:'Find an agent in Whitianga shows total sales which is misleading — should show suburb-specific sales only'},
+    ]
+  },
+
+  listingCategoryFlexibility: {
+    title: 'Listing category flexibility',
+    sub: 'From Slack B2B · 8 requests · "Trade Me is the only portal that doesn\'t allow this"',
+    stats: [
+      {label:'B2B requests',val:'8',color:'#1A6B3A'},
+      {label:'Trend',val:'Persistent',color:'#EF9F27'},
+      {label:'Agencies',val:'Waikato, Wellington, Harcourts'},
+      {label:'Priority score',val:'65',color:'#EF9F27'}
+    ],
+    sources: [{name:'Slack B2B',count:8},{name:'Account managers',count:4}],
+    tags: ['categories','listing','lifestyle','flexibility','competitive-gap'],
+    feedback: [
+      {source:'Slack B2B · Nimish Tanna · Jul 2025', text:'Allow agents to change property category once published — all other portals allow this; Trade Me is the only portal that doesn\'t'},
+      {source:'Slack B2B · Tracey Howe · Nov 2025', text:'Allow agents to amend categories without removing a listing so they don\'t lose watchlisters'},
+      {source:'Slack B2B · David Tudehope · Oct 2025', text:'Request for Lifestyle tab on its own — raised numerous times in 2026 pricing meetings. Massive win for many agencies.'},
+      {source:'Slack B2B · Dave Malkin · Nov 2024', text:'List properties in 2 categories e.g. Residential AND Lifestyle — avoids paying twice'},
+    ]
+  },
+
+  legalCompliance: {
+    title: '"Unless sold prior" — legal compliance wording',
+    sub: 'From Slack B2B · 3 requests · Legal requirement · HIGH URGENCY',
+    stats: [
+      {label:'B2B requests',val:'3',color:'#A32D2D'},
+      {label:'Risk',val:'Legal / REAA',color:'#A32D2D'},
+      {label:'Agencies',val:'Bayleys, Bayleys Tauranga'},
+      {label:'Priority score',val:'90',color:'#A32D2D'}
+    ],
+    sources: [{name:'Slack B2B',count:3},{name:'Account managers',count:2}],
+    tags: ['compliance','legal','auction','deadline-sale','REAA','urgent'],
+    feedback: [
+      {source:'Slack B2B · Chelsea Norman · Mar 2026', text:'Add "unless sold prior" next to auction method of sale on Trade Me — legal compliance requirement. Avoid compliance complaints if auction brought forward.'},
+      {source:'Slack B2B · Monique Edwards · Feb 2026', text:'Add "unless sold prior" to Auction and Deadline sale method display — resolve legal compliance requirement across all agencies'},
+      {source:'Slack B2B · Sharday Hanna · Nov 2024', text:'Allow rural properties to have + GST in the sale method — agents have been taken to REAA for misleading buyers on GST'},
+    ]
   }
 };
 
@@ -979,7 +1112,6 @@ const sizingData = {
 };
 
 const feedbackRows = [
-  // ── Original mock rows ──────────────────────────────────────────────────────
   {text:'"Payment keeps failing at checkout — tried 3 cards and nothing works."', meta:'Case #48291 · Buyer', src:'sf', srcLabel:'Salesforce', date:'Today 9:14am', sent:'neg', themes:['payments','checkout'], opp:'Fix checkout failures', oppKey:'checkout',
    drawer:{caseId:'#48291', date:'Today 9:14am', sentiment:'Negative', sentColor:'#A32D2D', userType:'Buyer', platform:'Mobile web', verbatim:'"Payment keeps failing at checkout — tried 3 cards and nothing works. Happened twice today. Very frustrating, I really wanted to buy this item."', tags:['payments','checkout','buyers','mobile'], oppLink:'Fix checkout payment failures', aiNote:'This matches 142 other Salesforce cases this month. The language around "tried multiple cards" is consistent with a payment gateway error rather than a card-specific issue — likely a systemic regression.'}},
   {text:'"Payment page kept erroring out on my phone."', meta:'Case #48187 · Buyer', src:'sf', srcLabel:'Salesforce', date:'Today 7:52am', sent:'neg', themes:['payments','mobile'], opp:'Fix checkout failures', oppKey:'checkout',
@@ -992,118 +1124,6 @@ const feedbackRows = [
    drawer:{caseId:'NPS #3821', date:'2 days ago', sentiment:'Negative', sentColor:'#A32D2D', userType:'Seller', platform:'Desktop', verbatim:'"I don\'t understand why my fees changed — no warning at all. I only noticed because my payout was lower than expected."', tags:['fees','sellers','billing'], oppLink:'Clarify seller fee structure', aiNote:'Fee confusion spike correlates with pricing update 10 days ago. 88% of fee-related feedback comes from sellers active for >6 months.'}},
   {text:'"Photo upload keeps failing on my iPhone — happens every single time."', meta:'Case #47455 · Seller', src:'sf', srcLabel:'Salesforce', date:'3 days ago', sent:'neg', themes:['photos','mobile'], opp:'Photo upload failures', oppKey:'photos',
    drawer:{caseId:'#47455', date:'3 days ago', sentiment:'Negative', sentColor:'#A32D2D', userType:'Seller', platform:'iOS app', verbatim:'"Photo upload keeps failing on my iPhone — happens every single time. I have to use the desktop site instead which is annoying."', tags:['photos','mobile','upload'], oppLink:'Reduce photo upload failures', aiNote:'iOS-specific photo upload failure is the primary variant. Likely related to iOS 17.x file permission changes.'}},
-
-  // ── Real data: Slack B2B Suggestions ────────────────────────────────────────
-  {text:'Allow agents to amend categories without removing a listing so they don\'t lose watchlisters', meta:'Tracey Howe · Agents', src:'slack', srcLabel:'Slack B2B', date:'19 Nov 2025', sent:'neg', themes:['listing','categories','watchlist'], opp:'Listing category flexibility', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'19 Nov 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'OneHub', verbatim:'Allow agents to amend categories without removing a listing so they don\'t lose watchlisters', tags:['listing','categories','watchlist','agents'], oppLink:'Listing category flexibility', aiNote:'Submitted by Jon Allison. Impact: Easier conversations with vendors and a more successful campaign. This is one of ~8 requests about category flexibility — agents on other portals can do this already.'}},
-  {text:'Watchlist Connect reporting/delivery issue — agent update not visible in PBI and agent didn\'t receive it', meta:'Agent Aaron Foss · All customers', src:'slack', srcLabel:'Slack B2B', date:'19 Nov 2025', sent:'neg', themes:['watchlist','reporting'], opp:'Watchlist Connect improvements', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'19 Nov 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'PowerBI / Watchlist Connect', verbatim:'Watchlist Connect reporting/delivery issue - agent update not visible in PBI and agent says he didn\'t receive it', tags:['watchlist','reporting','delivery'], oppLink:'Watchlist Connect improvements', aiNote:'Submitted by Anna Bloomfield. Impact: Help report on watchlist updates; confirm if update was sent to everyone. Delivery confirmation gap in Watchlist Connect product.'}},
-  {text:'Add clickable 2026 pricing link to Onehub My Rate Cards for sale section', meta:'Agent Ray White · All customers', src:'slack', srcLabel:'Slack B2B', date:'17 Nov 2025', sent:'neg', themes:['onehub','pricing'], opp:'OneHub usability improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'17 Nov 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'OneHub', verbatim:'Add clickable 2026 pricing link to Onehub My Rate Cards for sale section', tags:['onehub','pricing','usability'], oppLink:'OneHub usability improvements', aiNote:'Submitted by Anna Bloomfield. Impact: Helpful so agents wouldn\'t have to search or email for pricing. Quick win — reduces inbound pricing queries.'}},
-  {text:'New Homes Watchlist Connect messages don\'t suit the stock type; could have x2 and reset after 3 months', meta:'Bayleys Projects · New Homes', src:'slack', srcLabel:'Slack B2B', date:'4 Nov 2025', sent:'neg', themes:['watchlist','new homes'], opp:'Watchlist Connect improvements', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'4 Nov 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Developer / New Homes', platform:'Watchlist Connect', verbatim:'New Homes Watchlist Connect messages don\'t suit the stock type; could have x2 and reset after 3 months', tags:['watchlist','new-homes','messaging'], oppLink:'Watchlist Connect improvements', aiNote:'Submitted by Richard Warner. Impact: Enable more engagement; greater value perceived by agent and vendor. New Homes is a distinct product context that current Watchlist Connect doesn\'t cater for.'}},
-  {text:'International website links for makaan.com and thinkofliving.com not leading to listing pages', meta:'Multiple listings in OneHub · Gold & Platinum customers', src:'slack', srcLabel:'Slack B2B', date:'28 Oct 2025', sent:'neg', themes:['international','listings','bug'], opp:'International listing links fix', oppKey:'photos',
-   drawer:{caseId:'Slack B2B', date:'28 Oct 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'OneHub / Partner sites', verbatim:'International website links for makaan.com and thinkofliving.com not leading to listing pages', tags:['international','bug','gold','platinum'], oppLink:'International listing links fix', aiNote:'Submitted by Nimish Tanna. Impact: Vendors feel cheated if international links they paid for don\'t work. This is a paid feature that is broken — high urgency.'}},
-  {text:'Albany Heights suburb classified in Rodney but Albany is in North Shore City — agents want clarification', meta:'Ray White Albany · All Albany Heights listers', src:'slack', srcLabel:'Slack B2B', date:'14 Oct 2025', sent:'neg', themes:['search','suburbs','categories'], opp:'Search & suburb accuracy', oppKey:'search',
-   drawer:{caseId:'Slack B2B', date:'14 Oct 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Albany Heights suburb classified in Rodney but Albany is in North Shore City - seeking clarification', tags:['search','suburbs','data'], oppLink:'Search & suburb accuracy', aiNote:'Submitted by Anna Bloomfield. Impact: More people search North Shore City than Rodney — misclassification reduces listing visibility.'}},
-  {text:'Share rental insights report data as a CSV file', meta:'Rosa from Harcourts Asset Managers · Rental PA customers', src:'slack', srcLabel:'Slack B2B', date:'8 Oct 2025', sent:'neg', themes:['reporting','rentals','export'], opp:'Reporting export & automation', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'8 Oct 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Property Manager', platform:'OneHub / Rental Insights', verbatim:'Share rental insights report data as a CSV file', tags:['reporting','rentals','csv','export'], oppLink:'Reporting export & automation', aiNote:'Submitted by Nicole Gillies. Impact: Increased adoption; currently low adoption as PMs don\'t have individual logins. CSV export is a common ask across multiple reporting products.'}},
-  {text:'Include watchlisters/unique users in Pre-list Report; enable chosen suburbs not just all nearby', meta:'John Kettle & Blair Double — Tommy\'s Real Estate · All partners', src:'slack', srcLabel:'Slack B2B', date:'2 Oct 2025', sent:'neg', themes:['watchlist','reporting','pre-list'], opp:'Watchlist Connect improvements', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'2 Oct 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Pre-list Report', verbatim:'Include watchlisters/unique users in Pre-list Report; enable chosen suburbs not just all nearby', tags:['watchlist','pre-list','reporting'], oppLink:'Watchlist Connect improvements', aiNote:'Submitted by Dave Malkin. Impact: Increase value of vendor conversations at appraisal; avoid false confidence. Pre-list report enhancement with watchlist data.'}},
-  {text:'Request for Lifestyle tab on its own — raised numerous times in 2026 pricing meetings', meta:'Numerous customers · Agents selling lifestyle properties', src:'slack', srcLabel:'Slack B2B', date:'1 Oct 2025', sent:'neg', themes:['categories','lifestyle','search'], opp:'Listing category flexibility', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'1 Oct 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Request for Lifestyle tab on its own — raised numerous times in 2026 pricing meetings', tags:['categories','lifestyle','navigation'], oppLink:'Listing category flexibility', aiNote:'Submitted by David Tudehope. Impact: Massive win for many agencies. High-frequency request — described as raised "numerous times" in pricing meetings.'}},
-  {text:'Enquiry should go to both lead and secondary agent, not just lead', meta:'Paul Neshausen Team · All customers with two agents on a listing', src:'slack', srcLabel:'Slack B2B', date:'30 Sep 2025', sent:'neg', themes:['enquiry','agents','co-listing'], opp:'Multi-agent enquiry routing', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'30 Sep 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Enquiry should go to both lead and secondary agent not just lead', tags:['enquiry','co-listing','agents'], oppLink:'Multi-agent enquiry routing', aiNote:'Submitted by Anna Bloomfield. Impact: Won\'t miss enquiries if lead agent is away. This is one of 5+ requests about multi-agent enquiry routing — a clear pattern.'}},
-  {text:'Weekly/daily activity statement to office showing properties live and packages applied', meta:'Branch Managers / Admins · Branch Managers', src:'slack', srcLabel:'Slack B2B', date:'18 Sep 2025', sent:'neg', themes:['reporting','onehub','admin'], opp:'Reporting export & automation', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'18 Sep 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Branch Manager / Admin', platform:'OneHub', verbatim:'Weekly/daily activity statement to office showing properties live and packages applied', tags:['reporting','admin','packages'], oppLink:'Reporting export & automation', aiNote:'Submitted by Karen Martin. Impact: Acts as a double-check that correct package was selected; mitigates credit requirements.'}},
-  {text:'Send email enquiry to both agents on a listing, not just the lead', meta:'Ellie Hooper B&T and multiple agents · Listings with 2 agents', src:'slack', srcLabel:'Slack B2B', date:'18 Sep 2025', sent:'neg', themes:['enquiry','agents','co-listing'], opp:'Multi-agent enquiry routing', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'18 Sep 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Send email enquiry to both agents on a listing not just the lead', tags:['enquiry','co-listing','email'], oppLink:'Multi-agent enquiry routing', aiNote:'Submitted by Karen Martin. Impact: Ensure both agents receive the lead; 2nd agent often responsible for follow-up. Duplicate request to Sep 30 — reinforces pattern.'}},
-  {text:'Add price brackets for each property to the Watchlist Interest Report', meta:'Amanda Stewart Bayleys · Agents', src:'slack', srcLabel:'Slack B2B', date:'10 Sep 2025', sent:'neg', themes:['watchlist','reporting','pricing'], opp:'Watchlist Connect improvements', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'10 Sep 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Watchlist Interest Report', verbatim:'Add price brackets for each property to the Watchlist Interest Report', tags:['watchlist','reporting','price-brackets'], oppLink:'Watchlist Connect improvements', aiNote:'Submitted by Jon Allison. Impact: Shows vendors price brackets other watchlisted properties sit in; currently done manually. Saves agents manual work they\'re already doing.'}},
-  {text:'Marker on listing activity report showing where Watchlist Connect and Audience Extension were applied', meta:'Tim Hawes · All customers and TM sales teams', src:'slack', srcLabel:'Slack B2B', date:'1 Sep 2025', sent:'neg', themes:['watchlist','reporting','audience extension'], opp:'Watchlist Connect improvements', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'1 Sep 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Listing Activity Report', verbatim:'Marker on listing activity report showing where Watchlist Connect and Audience Extension were applied', tags:['watchlist','audience-extension','reporting'], oppLink:'Watchlist Connect improvements', aiNote:'Submitted by Chelsea Norman. Impact: Easily show direct impact of these products on listing activity. Helps agents prove ROI to vendors.'}},
-  {text:'Stuff Luxury Carousel more inclusive of Bay of Plenty with regionalised price thresholds', meta:'Most clients in BOP including Oliver Road · Agents and users', src:'slack', srcLabel:'Slack B2B', date:'26 Aug 2025', sent:'neg', themes:['pricing','regional','luxury'], opp:'Regional pricing threshold flexibility', oppKey:'fees',
-   drawer:{caseId:'Slack B2B', date:'26 Aug 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Stuff Luxury Carousel', verbatim:'Stuff Luxury Carousel more inclusive of Bay of Plenty with regionalised price thresholds', tags:['luxury','regional','BOP','pricing'], oppLink:'Regional pricing threshold flexibility', aiNote:'Submitted by Monique Edwards. Impact: Makes luxury carousel more relevant and a stronger value add in regional markets. This request appears multiple times from different regions.'}},
-  {text:'Sort order options for listings in OneHub', meta:'Harcourts Blenheim · Agents', src:'slack', srcLabel:'Slack B2B', date:'21 Aug 2025', sent:'neg', themes:['onehub','usability'], opp:'OneHub usability improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'21 Aug 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'OneHub', verbatim:'Sort order options for listings in OneHub', tags:['onehub','sort','usability'], oppLink:'OneHub usability improvements', aiNote:'Submitted by Michaela Malloch. Impact: Help find listings easily to access Watchlist Connect. Basic UX improvement with high utility.'}},
-  {text:'More info in withdrawn listing notice emails — client listing number or property address', meta:'Multiple Barfoot & Thompson offices · All offices', src:'slack', srcLabel:'Slack B2B', date:'20 Aug 2025', sent:'neg', themes:['listings','email','admin'], opp:'Listing admin improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'20 Aug 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Admin', platform:'Email notifications', verbatim:'More info in withdrawn listing notice emails - client listing number or property address', tags:['listings','email','admin','notifications'], oppLink:'Listing admin improvements', aiNote:'Submitted by Luke Gerber. Impact: Email notice becomes useful for checking deactivation fund returns and signboard removal.'}},
-  {text:'Integrate Pre-list report into Relab CMA tool', meta:'Harcourts Grenadier · Any client using Relab tool', src:'slack', srcLabel:'Slack B2B', date:'18 Aug 2025', sent:'pos', themes:['integrations','pre-list','reporting'], opp:'Third-party integrations', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'18 Aug 2025', sentiment:'Positive', sentColor:'#3B6D11', userType:'Agent', platform:'Relab / Pre-list Report', verbatim:'Integrate Pre-list report into Relab CMA tool', tags:['integration','relab','pre-list'], oppLink:'Third-party integrations', aiNote:'Submitted by Michaela Malloch. Impact: Creates reliance on TM tools; strengthens relationship and value offering. Strategic integration opportunity.'}},
-  {text:'Add watchlisters on listing detail page in OneHub; add parking/offstreet/carport icon', meta:'Agent Konrad Ray White Albany · Customers and Trade Me users', src:'slack', srcLabel:'Slack B2B', date:'12 Aug 2025', sent:'neg', themes:['onehub','watchlist','listing'], opp:'OneHub usability improvements', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'12 Aug 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'OneHub', verbatim:'Add watchlisters on listing detail page in OneHub; add parking/offstreet/carport icon', tags:['onehub','watchlist','icons'], oppLink:'OneHub usability improvements', aiNote:'Submitted by Anna Bloomfield. Impact: Garaging icon useful for users and agents promoting properties.'}},
-  {text:'Add agent vs market report and supply and demand data to OneHub', meta:'Agents · All customers', src:'slack', srcLabel:'Slack B2B', date:'5 Aug 2025', sent:'neg', themes:['onehub','reporting','market data'], opp:'OneHub usability improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'5 Aug 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'OneHub', verbatim:'Add agent vs market report and supply and demand data to OneHub', tags:['onehub','market-data','reporting'], oppLink:'OneHub usability improvements', aiNote:'Submitted by Jon Allison. Impact: Can access themselves; increases OneHub usage needed for Watchlist Connect.'}},
-  {text:'Allow agents to change property category once published — e.g. residential to lifestyle', meta:'At least 20 agents from Waikato · All agents', src:'slack', srcLabel:'Slack B2B', date:'18 Jul 2025', sent:'neg', themes:['listing','categories'], opp:'Listing category flexibility', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'18 Jul 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Allow agents to change property category once published e.g. residential to lifestyle', tags:['categories','listing','flexibility'], oppLink:'Listing category flexibility', aiNote:'Submitted by Nimish Tanna. Impact: All other portals allow this; Trade Me is the only portal that doesn\'t. Competitive gap — raised by 20+ agents.'}},
-  {text:'Marketing report automation — schedule vendor marketing reports instead of manually creating them', meta:'Lots of agents · Time-poor agents', src:'slack', srcLabel:'Slack B2B', date:'9 Jul 2025', sent:'neg', themes:['reporting','automation','vendor reports'], opp:'Reporting export & automation', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'9 Jul 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'OneHub / Vendor Reports', verbatim:'Marketing report automation - schedule vendor marketing reports instead of manually creating them', tags:['reporting','automation','vendor'], oppLink:'Reporting export & automation', aiNote:'Submitted by Jeremy Leighton. Impact: Save time; meet agent expectations; competitors already offer this. Scheduling/automation is a repeated ask.'}},
-  {text:'Open home/viewing times for section listings', meta:'David Soar — Cambridge Real Estate · All agents with section listings', src:'slack', srcLabel:'Slack B2B', date:'8 Jul 2025', sent:'neg', themes:['listing','open homes','sections'], opp:'Section listing improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'8 Jul 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Open home/viewing times for section listings', tags:['open-homes','sections','listing'], oppLink:'Section listing improvements', aiNote:'Submitted by Nimish Tanna. Impact: Agents can\'t coordinate viewings; buyers miss viewing times in descriptions. Feature parity gap for section listings.'}},
-  {text:'Request Property Files button causing frustration — users click it instead of the link in the description', meta:'Agents · Agents', src:'slack', srcLabel:'Slack B2B', date:'26 Jun 2025', sent:'neg', themes:['ux','listing','enquiry'], opp:'Listing UX improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'26 Jun 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Request Property Files button causing frustration as users click it instead of the link in the description', tags:['ux','cta','listing','files'], oppLink:'Listing UX improvements', aiNote:'Submitted by Michaela Malloch. Impact: Lessen workload for agents. CTA confusion — button placement is overriding agent intent.'}},
-  {text:'Change Find an Agent logic — currently promoting agents who\'ve never sold in the suburb', meta:'Many customers incl. Harcourts Masterton · Vendors', src:'slack', srcLabel:'Slack B2B', date:'23 Jun 2025', sent:'neg', themes:['find an agent','search','accuracy'], opp:'Find an Agent accuracy', oppKey:'search',
-   drawer:{caseId:'Slack B2B', date:'23 Jun 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent / Vendor', platform:'Find an Agent', verbatim:'Change Find an Agent logic to match Homes.co.nz - currently promoting agents who\'ve never sold in the suburb', tags:['find-an-agent','accuracy','suburb'], oppLink:'Find an Agent accuracy', aiNote:'Submitted by Dave Malkin. Impact: Accurate data for vendors; supports top local agents; increases credibility. Find an Agent accuracy is a repeated theme across 5+ submissions.'}},
-  {text:'Add column to appraisal lead reports showing which leads came to market — to prove leads are genuine', meta:'All Gold & Plat PA customers · Gold & Plat PA customers', src:'slack', srcLabel:'Slack B2B', date:'19 Jun 2025', sent:'neg', themes:['reporting','leads','appraisal'], opp:'Reporting export & automation', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'19 Jun 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Appraisal Lead Reports', verbatim:'Add column to appraisal lead reports showing which leads came to market - to prove leads are genuine', tags:['appraisal','leads','reporting'], oppLink:'Reporting export & automation', aiNote:'Submitted by Nimish Tanna. Impact: Proves appraisal leads are genuine; reiterates value of Gold and Plat PAs.'}},
-  {text:'Add Any price filter below $2500 for rental price range options', meta:'Hilary Sampson — Tommy\'s PM · Rental customers', src:'slack', srcLabel:'Slack B2B', date:'9 Jun 2025', sent:'neg', themes:['rentals','search','filters'], opp:'Rental search improvements', oppKey:'search',
-   drawer:{caseId:'Slack B2B', date:'9 Jun 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Property Manager', platform:'Trade Me Rentals', verbatim:'Add Any price filter below $2500 for rental price range options', tags:['rentals','search','filters','pricing'], oppLink:'Rental search improvements', aiNote:'Submitted by Nicole Gillies. Impact: Capture all potential enquiries; properties above $2500 currently not shown.'}},
-  {text:'Free text in additional languages on OneHub', meta:'Ray White Leaders, Harcourts, Team Group, Tremains Hawke\'s Bay · All', src:'slack', srcLabel:'Slack B2B', date:'5 Jun 2025', sent:'neg', themes:['onehub','languages','listing'], opp:'OneHub usability improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'5 Jun 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'OneHub', verbatim:'Free text in additional languages on OneHub', tags:['onehub','languages','accessibility'], oppLink:'OneHub usability improvements', aiNote:'Submitted by Dave Malkin. Impact: Able to add all languages not just the few available. Multicultural market need.'}},
-  {text:'Find an Agent not recommending right agents per suburb — using total performance not suburb-specific', meta:'Tommy\'s Real Estate, Ray White Leaders · Gold and Platinum Partners', src:'slack', srcLabel:'Slack B2B', date:'5 Jun 2025', sent:'neg', themes:['find an agent','search','accuracy'], opp:'Find an Agent accuracy', oppKey:'search',
-   drawer:{caseId:'Slack B2B', date:'5 Jun 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Find an Agent', verbatim:'Find an Agent not recommending right agents per suburb - using total performance not suburb-specific', tags:['find-an-agent','accuracy','suburb'], oppLink:'Find an Agent accuracy', aiNote:'Submitted by Dave Malkin. Impact: Support top local agents; accurate vendor info; increase credibility; drive retention. Repeated from Jun 23 — different customers, same pain.'}},
-  {text:'Homes.co.nz enquiry email subject lines poor — should mirror Trade Me format', meta:'Steven Bridson — Harcourts Gold Star Group · All agents', src:'slack', srcLabel:'Slack B2B', date:'3 Jun 2025', sent:'neg', themes:['homes.co.nz','email','enquiry'], opp:'Homes.co.nz parity improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'3 Jun 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Homes.co.nz', verbatim:'Homes.co.nz enquiry email subject lines poor - should mirror Trade Me format', tags:['homes','email','enquiry','parity'], oppLink:'Homes.co.nz parity improvements', aiNote:'Submitted by Nimish Tanna. Impact: Simplify and make enquiry formats uniform across TMP and Homes.'}},
-  {text:'Add recent sold data to Watchlist Report showing listings the current listing\'s watchers also had', meta:'Harcourts Hawke\'s Bay · Partners', src:'slack', srcLabel:'Slack B2B', date:'30 May 2025', sent:'pos', themes:['watchlist','reporting','sold data'], opp:'Watchlist Connect improvements', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'30 May 2025', sentiment:'Positive', sentColor:'#3B6D11', userType:'Agent', platform:'Watchlist Report', verbatim:'Add recent sold data to Watchlist Report showing listings the current listing\'s watchers also had', tags:['watchlist','sold-data','reporting'], oppLink:'Watchlist Connect improvements', aiNote:'Submitted by Dave Malkin. Impact: Live listing data is great but sold data gives real-time idea of what\'s selling; helps manage vendor expectations.'}},
-  {text:'Add unless sold prior next to auction method of sale on Trade Me — legal compliance requirement', meta:'Gaby Troutbeck — Bayleys · Agents', src:'slack', srcLabel:'Slack B2B', date:'9 Mar 2026', sent:'neg', themes:['compliance','listing','auction'], opp:'Legal compliance features', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'9 Mar 2026', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Add unless sold prior next to auction method of sale on Trade Me - legal compliance requirement', tags:['compliance','auction','legal'], oppLink:'Legal compliance features', aiNote:'Submitted by Chelsea Norman. Impact: Better communication with buyers; avoid compliance complaints if auction brought forward. Legal requirement — high urgency.'}},
-  {text:'Adjust logic for price drop tag or enable removal — triggered by data entry errors, can\'t be removed for 7 days', meta:'Tommy\'s Real Estate — Alexia Stoddart · All', src:'slack', srcLabel:'Slack B2B', date:'3 Mar 2026', sent:'neg', themes:['listing','ux','pricing'], opp:'Listing UX improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'3 Mar 2026', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Adjust logic for price drop tag or enable removal - triggered by data entry errors and can\'t be removed for 7 days', tags:['price-drop','ux','vendor-relations'], oppLink:'Listing UX improvements', aiNote:'Submitted by Dave Malkin. Impact: Improve vendor relationships; tag caused by innocent errors is causing friction. Vendor relations risk.'}},
-  {text:'Track My Property shows FOR SALE and estimate price to homeowners — confusing and causing difficult vendor conversations', meta:'EVES on Cameron — escalated to branch manager · B2B customers', src:'slack', srcLabel:'Slack B2B', date:'5 Feb 2026', sent:'neg', themes:['track my property','vendor relations','ux'], opp:'Track My Property UX', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'5 Feb 2026', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Track My Property / App', verbatim:'Track My Property shows FOR SALE and estimate price to homeowners - confusing and causing difficult vendor conversations', tags:['track-my-property','vendor','ux'], oppLink:'Track My Property UX', aiNote:'Submitted by Monique Edwards. Impact: Fewer irate vendor conversations about Trade Me app features. Escalated to branch manager — significant sentiment issue.'}},
-  {text:'Clarify watchlist number on listing — all time vs current causing vendor complaints of false advertising', meta:'LJ Hooker Waihi Beach · All', src:'slack', srcLabel:'Slack B2B', date:'18 Feb 2026', sent:'neg', themes:['watchlist','listing','vendor relations'], opp:'Watchlist Connect improvements', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'18 Feb 2026', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Clarify watchlist number on listing - all time vs current causing vendor complaints of false advertising', tags:['watchlist','vendor','clarity'], oppLink:'Watchlist Connect improvements', aiNote:'Submitted by Monique Edwards. Impact: Avoid B2B customers having to explain the difference and prevent vendor complaints.'}},
-  {text:'Business Sales listings don\'t pull through agency logo — needs to be addressed urgently', meta:'Bayleys Success Realty Marketing Manager · Business Sales customers', src:'slack', srcLabel:'Slack B2B', date:'13 Feb 2026', sent:'neg', themes:['listings','bug','business sales'], opp:'Listing display bugs', oppKey:'photos',
-   drawer:{caseId:'Slack B2B', date:'13 Feb 2026', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Business Sales', verbatim:'Business Sales listings don\'t pull through agency logo - needs to be addressed urgently', tags:['business-sales','logo','bug'], oppLink:'Listing display bugs', aiNote:'Submitted by Monique Edwards. Impact: Bayleys advertise they sell businesses on Trade Me; logo not displaying is a problem. Marked urgent by customer.'}},
-  {text:'Allow agent to choose which agent receives enquiries on a shared listing', meta:'Jo Harwood · Agents who share listings', src:'slack', srcLabel:'Slack B2B', date:'13 Feb 2026', sent:'neg', themes:['enquiry','agents','co-listing'], opp:'Multi-agent enquiry routing', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'13 Feb 2026', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Allow agent to choose which agent receives enquiries on a shared listing', tags:['enquiry','co-listing','routing'], oppLink:'Multi-agent enquiry routing', aiNote:'Submitted by Jon Allison. Impact: Make working in teams easier - agent can choose who owns the enquiry for each property.'}},
-  {text:'Ability to choose the top three images from a listing\'s lineup rather than being order-dependent', meta:'Derek — Point Chev · Agents', src:'slack', srcLabel:'Slack B2B', date:'10 Feb 2026', sent:'neg', themes:['listing','photos','ux'], opp:'Listing UX improvements', oppKey:'photos',
-   drawer:{caseId:'Slack B2B', date:'10 Feb 2026', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Ability to choose the top three images from a listing\'s lineup rather than being order-dependent', tags:['photos','listing','ux'], oppLink:'Listing UX improvements', aiNote:'Submitted by Anna Bloomfield. Impact: More flexibility for choosing photos and the order they are displayed.'}},
-  {text:'Automate sold data feeding through to Trade Me for B&T — currently manual, agents very unhappy', meta:'Bob Qin — B&T Millwater · All B&T agents', src:'slack', srcLabel:'Slack B2B', date:'10 Dec 2024', sent:'neg', themes:['sold data','automation','integrations'], opp:'Reporting export & automation', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'10 Dec 2024', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Trade Me Property', verbatim:'Automate sold data feeding through to Trade Me for B&T - currently manual and agents very unhappy', tags:['sold-data','automation','B&T'], oppLink:'Reporting export & automation', aiNote:'Submitted by Karen Martin. Impact: Positive customer sentiment; sales feature in Platinum lead appraisal; raised in majority of agent meetings.'}},
-  {text:'Search by school zone or school zone filter', meta:'Nadja Court & Desiree Tod · All property searchers', src:'slack', srcLabel:'Slack B2B', date:'13 Nov 2024', sent:'pos', themes:['search','filters','school zones'], opp:'Search & suburb accuracy', oppKey:'search',
-   drawer:{caseId:'Slack B2B', date:'13 Nov 2024', sentiment:'Positive', sentColor:'#3B6D11', userType:'Buyer / Agent', platform:'Trade Me Property', verbatim:'Search by school zone or school zone filter', tags:['search','school-zones','filters'], oppLink:'Search & suburb accuracy', aiNote:'Submitted by Jason Hussey. Impact: Easier to sign Platinum PAs. School zone search is a significant buyer need — missing vs competitor offerings.'}},
-  {text:'Build office-level reporting in OneHub for rental customers — current login reporting shows incorrect numbers', meta:'Resido (Kiwi Property) · Rental customers', src:'slack', srcLabel:'Slack B2B', date:'6 Nov 2024', sent:'neg', themes:['reporting','rentals','onehub'], opp:'Reporting export & automation', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'6 Nov 2024', sentiment:'Negative', sentColor:'#A32D2D', userType:'Property Manager', platform:'OneHub / Rentals', verbatim:'Build office-level reporting in OneHub for rental customers - current Trade Me login reporting shows incorrect numbers', tags:['reporting','rentals','office-level'], oppLink:'Reporting export & automation', aiNote:'Submitted by Nicole Gillies. Impact: Access to important reporting to benchmark performance vs competitors. Data accuracy issue.'}},
-  {text:'Add Expressions of Interest as a commercial property sales method', meta:'Colliers and CBRE · All commercial agencies', src:'slack', srcLabel:'Slack B2B', date:'6 Nov 2024', sent:'pos', themes:['commercial','listing','sales method'], opp:'Commercial listing improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'6 Nov 2024', sentiment:'Positive', sentColor:'#3B6D11', userType:'Commercial Agent', platform:'Trade Me Commercial', verbatim:'Add Expressions of Interest as a commercial property sales method', tags:['commercial','EOI','sales-method'], oppLink:'Commercial listing improvements', aiNote:'Submitted by Jason Hussey. Impact: Opportunity to capture more high-value listings and greatly improve sentiment. Major commercial agencies requesting this.'}},
-  {text:'Flood risk zones map on Trade Me property', meta:'Helen Shaw · Buyers wanting flood zone info', src:'slack', srcLabel:'Slack B2B', date:'10 Oct 2024', sent:'pos', themes:['search','maps','buyer features'], opp:'Buyer data & search features', oppKey:'search',
-   drawer:{caseId:'Slack B2B', date:'10 Oct 2024', sentiment:'Positive', sentColor:'#3B6D11', userType:'Buyer', platform:'Trade Me Property', verbatim:'Add flood risk zones map to Trade Me property', tags:['flood-risk','map','data','buyers'], oppLink:'Buyer data & search features', aiNote:'Submitted by Jon Allison. Impact: Competitors apparently have this information. Growing consumer demand given recent NZ flood events.'}},
-  {text:'Keywords accessible to agents — self-service trending search keyword data', meta:'Multiple customers (10+ in last 6 months) · All partners', src:'slack', srcLabel:'Slack B2B', date:'18 Feb 2025', sent:'pos', themes:['search','data','agents'], opp:'Agent data & insights tools', oppKey:'search',
-   drawer:{caseId:'Slack B2B', date:'18 Feb 2025', sentiment:'Positive', sentColor:'#3B6D11', userType:'Agent', platform:'OneHub / Trade Me', verbatim:'Keywords accessible to agents - self-service trending search keyword data', tags:['keywords','search-data','agents'], oppLink:'Agent data & insights tools', aiNote:'Submitted by Dave Malkin. Impact: Perception improvement; value in descriptions/titles; removes friction; RE sends this monthly. 10+ requests in 6 months.'}},
-  {text:'OneHub for Business Owners/Branch Managers — branch-level overview of agents and listing performance', meta:'Tim Hawes — Ray White Grey Lynn · All Business Owners/Branch Managers', src:'slack', srcLabel:'Slack B2B', date:'18 Feb 2025', sent:'pos', themes:['onehub','reporting','branch management'], opp:'OneHub usability improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'18 Feb 2025', sentiment:'Positive', sentColor:'#3B6D11', userType:'Branch Manager / Business Owner', platform:'OneHub', verbatim:'OneHub for Business Owners/Branch Managers - branch-level overview of agents and listing performance', tags:['onehub','branch','management'], oppLink:'OneHub usability improvements', aiNote:'Submitted by Chelsea Norman. Impact: Enable them to optimise overall business; better agent buy-in as managers can see performance.'}},
-  {text:'Global login solution for head offices in OneHub to access reports across all branches', meta:'Head Office Marketing Teams · Large Franchise operators', src:'slack', srcLabel:'Slack B2B', date:'30 Jan 2025', sent:'pos', themes:['onehub','admin','enterprise'], opp:'OneHub usability improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'30 Jan 2025', sentiment:'Positive', sentColor:'#3B6D11', userType:'Head Office / Franchise', platform:'OneHub', verbatim:'Global login solution for head offices in OneHub to access reports across all branches', tags:['onehub','global-login','enterprise'], oppLink:'OneHub usability improvements', aiNote:'Submitted by Jason Hussey. Impact: More useful OneHub; encourages Head Offices to push agents towards OneHub. Enterprise feature gap.'}},
-  {text:'Auto-send/schedule weekly listing performance report to agents from OneHub', meta:'Bryn Perry — Owner of Isell Property · All owners and agents', src:'slack', srcLabel:'Slack B2B', date:'14 Nov 2024', sent:'pos', themes:['reporting','automation','onehub'], opp:'Reporting export & automation', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'14 Nov 2024', sentiment:'Positive', sentColor:'#3B6D11', userType:'Agent / Branch Owner', platform:'OneHub', verbatim:'Auto-send/schedule weekly listing performance report to agents from OneHub', tags:['reporting','automation','scheduled'], oppLink:'Reporting export & automation', aiNote:'Submitted by Shane Premraj. Impact: Clients see how listings are tracking and make adjustments to marketing accordingly. Automation/scheduling is a very common ask.'}},
-  {text:'More insights on watchlist report — add recently sold listings with shared watchers and date-stamp report', meta:'Harcourts Hawke\'s Bay · All partners', src:'slack', srcLabel:'Slack B2B', date:'5 Dec 2025', sent:'pos', themes:['watchlist','reporting','sold data'], opp:'Watchlist Connect improvements', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'5 Dec 2025', sentiment:'Positive', sentColor:'#3B6D11', userType:'Agent', platform:'Watchlist Report', verbatim:'More insights on watchlist report - add recently sold listings with shared watchers and date-stamp report', tags:['watchlist','sold-data','reporting'], oppLink:'Watchlist Connect improvements', aiNote:'Submitted by Dave Malkin. Impact: Increase value of vendor conversations; show competitive listings that have sold or been withdrawn.'}},
-  {text:'Make the map on property more visible — consistently heard that people don\'t know it exists', meta:'Several clients and property searchers · All', src:'slack', srcLabel:'Slack B2B', date:'5 Dec 2025', sent:'neg', themes:['ux','maps','discovery'], opp:'Buyer data & search features', oppKey:'search',
-   drawer:{caseId:'Slack B2B', date:'5 Dec 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Buyer / Agent', platform:'Trade Me Property', verbatim:'Make the map on property more visible - consistently heard that people don\'t know it exists', tags:['map','ux','discovery'], oppLink:'Buyer data & search features', aiNote:'Submitted by Dave Malkin. Impact: Map is a great engagement tool; some buyers use RE.co specifically for the map. Feature exists but isn\'t discoverable.'}},
-  {text:'Team Profiles on Trade Me — for high-performing teams', meta:'Multiple high-performing teams · All high-performing teams', src:'slack', srcLabel:'Slack B2B', date:'12 Mar 2026', sent:'pos', themes:['agents','profiles','branding'], opp:'Agent profile improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'12 Mar 2026', sentiment:'Positive', sentColor:'#3B6D11', userType:'Agent Team', platform:'Trade Me Property', verbatim:'Team Profiles on Trade Me', tags:['team-profiles','branding','agents'], oppLink:'Agent profile improvements', aiNote:'Submitted by Sharday Hanna. Impact: Sentiment; removing frustration; visibility; profiling. Requested by multiple high-performing teams.'}},
-  {text:'Find an Agent — agents featuring at top of suburb without having sold a property there', meta:'B&T & RW · All agents', src:'slack', srcLabel:'Slack B2B', date:'12 Mar 2026', sent:'neg', themes:['find an agent','accuracy','suburb'], opp:'Find an Agent accuracy', oppKey:'search',
-   drawer:{caseId:'Slack B2B', date:'12 Mar 2026', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'Find an Agent', verbatim:'Find an Agent - agents featuring at top of suburb without having sold a property there', tags:['find-an-agent','accuracy','suburb'], oppLink:'Find an Agent accuracy', aiNote:'Submitted by Karen Martin. Impact: Correct visibility to audience of who has sold most properties in that specific suburb. Third separate submission about Find an Agent accuracy.'}},
-  {text:'Ability to download multiple vendor/watchlist reports at once rather than individually', meta:'Harcourts Hawke\'s Bay — Team Coludicutt · High-performing teams', src:'slack', srcLabel:'Slack B2B', date:'11 Dec 2025', sent:'neg', themes:['reporting','watchlist','download'], opp:'Reporting export & automation', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'11 Dec 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'OneHub / Reports', verbatim:'Ability to download multiple vendor/watchlist reports at once rather than individually', tags:['reporting','bulk-download','watchlist'], oppLink:'Reporting export & automation', aiNote:'Submitted by Dave Malkin. Impact: Time saving; further product adoption; ease of use. Bulk actions are a consistent gap across reporting.'}},
-  {text:'Show sold properties on agent\'s TMP profile when they move offices', meta:'Thomas Farmer — Ray White Business Owner · All agents that move offices', src:'slack', srcLabel:'Slack B2B', date:'26 Feb 2026', sent:'neg', themes:['agents','profiles','sold data'], opp:'Agent profile improvements', oppKey:'messaging',
-   drawer:{caseId:'Slack B2B', date:'26 Feb 2026', sentiment:'Negative', sentColor:'#A32D2D', userType:'Agent', platform:'TMP Agent Profile', verbatim:'Show sold properties on agent\'s TMP profile when they move offices', tags:['agent-profile','sold-data','portability'], oppLink:'Agent profile improvements', aiNote:'Submitted by Karen Martin. Impact: Provides ongoing visibility of sold properties even after moving offices. Agent data portability gap.'}},
-  {text:'Tiered threshold for price drop notifications for high-value homes — luxury agents disadvantaged', meta:'Oliver Road Real Estate · High-end luxury homes', src:'slack', srcLabel:'Slack B2B', date:'28 Nov 2025', sent:'neg', themes:['pricing','notifications','luxury'], opp:'Regional pricing threshold flexibility', oppKey:'fees',
-   drawer:{caseId:'Slack B2B', date:'28 Nov 2025', sentiment:'Negative', sentColor:'#A32D2D', userType:'Luxury Agent', platform:'Trade Me Property', verbatim:'Tiered threshold for price drop notifications for high-value homes - luxury agents disadvantaged', tags:['luxury','notifications','threshold','pricing'], oppLink:'Regional pricing threshold flexibility', aiNote:'Submitted by Monique Edwards. Impact: Properties over $1.8M don\'t trigger notifications given smaller watchlist pools. Luxury segment edge case.'}},
-  {text:'Watchlist Sold Report — like Watchlist Interest but showing top 6 properties just sold with shared watchers', meta:'Client — Zani Polson · All agents', src:'slack', srcLabel:'Slack B2B', date:'20 Nov 2025', sent:'pos', themes:['watchlist','reporting','sold data'], opp:'Watchlist Connect improvements', oppKey:'watchlist',
-   drawer:{caseId:'Slack B2B', date:'20 Nov 2025', sentiment:'Positive', sentColor:'#3B6D11', userType:'Agent', platform:'Watchlist Reports', verbatim:'Watchlist Sold Report - like Watchlist Interest but showing top 6 properties just sold with shared watchers', tags:['watchlist','sold-data','new-report'], oppLink:'Watchlist Connect improvements', aiNote:'Submitted by Michaela Malloch. Impact: Add value to Platinum partners. Clear product spec already envisioned by customer.'}},
 ];
 
 // ══════════════════════════════════
@@ -1414,126 +1434,91 @@ document.getElementById('sizingSelect').addEventListener('change', function() {
 // AI ASSISTANT — LIVE CLAUDE API
 // ══════════════════════════════════
 
+// ── Feedback context loaded as AI system prompt ──────────────────────────────
 const FEEDBACK_CONTEXT = `
-You are an AI assistant for Trade Me's internal Insights Hub tool. You help product managers and designers understand customer feedback, identify trends, and prioritise opportunities. Trade Me is New Zealand's largest online marketplace and also operates Trade Me Property (TMP) and Homes.co.nz.
+You are an AI assistant for Trade Me's internal Insights Hub tool. You help product managers and designers understand customer feedback, identify trends, and prioritise opportunities. Trade Me is New Zealand's largest online marketplace.
 
-You have access to the following feedback dataset combining mock consumer feedback and REAL B2B feedback from Trade Me's Slack B2B Suggestions channel (113 items, submitted by Trade Me's property account managers on behalf of real estate agency customers, Nov 2024 – Mar 2026):
+You have access to the following mock feedback dataset (2,847 items, last 10 weeks):
 
 FEEDBACK SUMMARY DATA:
 ─────────────────────────────────────────────────────────────
-Total feedback items: ~3,000 (including 113 real B2B items)
-Sources: Salesforce Cases (42%), CSAT Surveys (30%), NPS Responses (18%), Slack B2B (real agent feedback, 4%)
-B2B feedback date range: Nov 2024 – Mar 2026
-Overall sentiment: 62% positive consumer feedback; B2B feedback is predominantly feature requests (neutral/negative framing)
+Total feedback items: 2,847
+Date range: Last 10 weeks (Jan–Mar 2025)
+Sources: Salesforce Cases (42%, 1,204 items), CSAT Surveys (30%, 847), NPS Responses (18%, 512), Slack feedback (10%, 284)
+Overall sentiment: 62% positive, 24% negative, 14% neutral (down 4% vs last month)
 
-TOP THEMES FROM B2B SLACK FEEDBACK (real data, ranked by volume):
-
-1. Watchlist Connect improvements — ~18 requests
-   - Sold data in watchlist reports (multiple requests from Harcourts Hawke's Bay, Harcourts Johnsonville, Professionals Wellington)
-   - Price brackets in watchlist report
-   - Delivery confirmation for Watchlist Connect messages
-   - New Homes-specific messaging
-   - All-time vs current watchlist count clarity (causing vendor complaints of "false advertising")
-   - Watchlist Sold Report (new product idea)
-   - Sample quotes: "Add recent sold data to Watchlist Report showing listings current listing's watchers also had", "Clarify watchlist number on listing - all time vs current causing vendor complaints"
-
-2. Reporting & automation — ~15 requests
-   - Schedule/automate vendor marketing reports (multiple requests - "competitors already offer this")
-   - Auto-send weekly listing performance reports
-   - Bulk download multiple watchlist/vendor reports
-   - CSV export of rental insights
-   - Appraisal lead reporting with proof of genuineness
-   - Build office-level reporting for rental customers
-   - Sample quotes: "Marketing report automation - schedule vendor marketing reports instead of manually creating them", "Ability to download multiple vendor/watchlist reports at once"
-
-3. OneHub usability — ~12 requests
-   - Sort order options for listings
-   - Branch manager / business owner view
-   - Global head office login across branches
-   - Agent vs market report and supply/demand data
-   - Free text in additional languages
-   - Show package downgrades in office profile
-   - Sample quotes: "OneHub for Business Owners/Branch Managers - branch-level overview of agents and listing performance"
-
-4. Multi-agent enquiry routing — ~5 requests
-   - Enquiry to go to both lead and secondary agent (multiple submissions, multiple agencies)
-   - Choose which agent receives enquiries on shared listing
-   - Sample quotes: "Enquiry should go to both lead and secondary agent not just lead" (raised by at least 4 separate agencies)
-
-5. Find an Agent accuracy — ~5 requests
-   - Agents ranked by total sales not suburb-specific sales
-   - Raised by Tommy's Real Estate, Ray White Wairarapa, Harcourts Masterton, B&T, Ray White
-   - Sample quotes: "Find an Agent logic currently promoting agents who've never sold in the suburb"
-
-6. Listing category flexibility — ~8 requests
-   - Change category without removing listing (losing watchlisters)
-   - Lifestyle tab as standalone category (raised "numerous times in 2026 pricing meetings")
-   - List properties in 2 categories e.g. Residential AND Lifestyle
-   - Sample quotes: "All other portals allow this; Trade Me is the only portal that doesn't"
-
-7. Sold data automation & agent profiles — ~4 requests
-   - Automate sold data for B&T (currently manual, "agents very unhappy")
-   - Show sold properties on agent profile when they move offices
-   - Add recent sales for specific agent on app
-
-8. Search improvements — ~5 requests
-   - School zone filter (buyer-facing)
-   - Multi-select districts in search
-   - Address search picking up suburb names from street addresses (bug)
-   - Suburb misclassification (Albany Heights in Rodney vs North Shore City)
-
-9. Legal / compliance — 3 requests (URGENT)
-   - "Unless sold prior" wording next to auction/deadline sales method (legal requirement raised by multiple agencies)
-   - Rural properties + GST compliance (agents taken to REAA)
-   - Sample quotes: "Add unless sold prior next to auction method of sale on Trade Me - legal compliance requirement"
-
-10. Track My Property / vendor relations issues — 2 requests
-    - Shows FOR SALE and estimate price to homeowners causing difficult vendor conversations
-    - Watchlist number clarity causing "false advertising" complaints
-
-CONSUMER FEEDBACK THEMES (mock data):
+TOP THEMES (ranked by volume):
 1. Checkout payment failures — 247 mentions (↑ 40% this week, SPIKE)
-2. Search relevance on mobile — 189 mentions
-3. Seller fee confusion — 164 mentions
+   - Sources: 58% Salesforce, 29% CSAT, 13% NPS
+   - Primarily buyers; mostly mobile (68%)
+   - Spike correlates with Tuesday deployment
+   - Sample quotes: "Payment keeps failing at checkout — tried 3 cards", "Card declined even though it has plenty of funds", "Payment page kept erroring on my phone"
+   - Sentiment: 94% negative
+
+2. Search relevance on mobile — 189 mentions (persistent, 3+ weeks)
+   - Sources: 41% NPS, 32% CSAT, 27% Slack
+   - Buyers searching for specific items getting irrelevant results
+   - Sample quotes: "Search results are useless on mobile", "Can't find anything I'm looking for", "Desktop search is fine but mobile is broken"
+   - Sentiment: 87% negative
+
+3. Seller fee confusion — 164 mentions (↑ since fee change announcement)
+   - Sources: 61% Salesforce, 22% NPS, 17% Slack
+   - Sellers uncertain about new fee structure, especially for Motors and Property
+   - Sample quotes: "Don't understand the new fee structure at all", "Was I charged the right amount?", "Need a simple breakdown of what I owe"
+   - Sentiment: 78% negative
+
 4. Photo upload errors — 121 mentions
+   - Sources: 54% Salesforce, 46% Slack
+   - Sellers can't upload listing photos; fails silently on iOS 17
+   - Sample quotes: "Photos just won't upload, no error message", "Works fine on Android, broken on iPhone"
+   - Sentiment: 91% negative
+
 5. Watchlist notifications — 97 mentions
+   - Sources: 67% NPS, 33% CSAT
+   - Items selling before notification arrives; buyers missing out
+   - Sample quotes: "Got the notification an hour after it sold", "Turned off notifs because they're always too late"
+   - Sentiment: 81% negative
+
 6. Buyer messaging UX — 74 mentions
-7. Listing draft lost — 52 mentions (NEW emerging)
+   - Sources: 48% CSAT, 36% NPS, 16% Slack
+   - Difficult to find message thread with seller; no read receipts
+   - Sentiment: 64% negative
 
-KEY B2B CUSTOMER TYPES IN DATA:
-- Real estate agents (individual and teams)
-- Branch managers / business owners (franchise networks)
-- Property managers (rental)
-- New Homes / developer customers
-- Head office / franchise marketing teams
-- Commercial agents (Colliers, CBRE)
+7. Listing draft lost — 52 mentions (NEW this week, emerging)
+   - Sources: 71% Salesforce, 29% Slack
+   - Sellers losing listing drafts after session timeout
+   - Sentiment: 96% negative
 
-KEY AGENCIES FREQUENTLY RAISING ISSUES:
-- Harcourts (multiple offices and groups)
-- Ray White (multiple offices)
-- Bayleys (multiple offices)
-- Tommy's Real Estate
-- Barfoot & Thompson (B&T)
-- Professionals group
+8. Motors valuation confusion — 41 mentions
+   - Sources: 60% NPS, 40% CSAT
+   - Buyers unclear on how vehicle valuations are calculated
 
-OPPORTUNITIES IDENTIFIED (B2B real data):
-- Watchlist Connect improvements (18 requests, persistent, high value)
-- Reporting automation & export (15 requests, competitive gap - "competitors already offer this")
-- Multi-agent enquiry routing (5+ requests, multiple agencies)
-- Find an Agent accuracy fix (5 requests, credibility risk)
-- Listing category flexibility (8 requests, competitive gap)
-- Legal compliance: "unless sold prior" wording (3 requests, urgent risk)
+BUYER vs SELLER BREAKDOWN:
+- Buyers (61%): Top pain points — payments, search, watchlist notifications
+- Sellers (39%): Top pain points — fee confusion, photo upload, listing drafts
+
+RECENT ALERTS:
+- Payment failure mentions up 40% in 24h (2 hours ago)
+- New theme detected: "listing draft lost" (5 hours ago)
+- Salesforce case volume above threshold (yesterday)
+
+OPPORTUNITIES ALREADY IDENTIFIED:
+- Fix checkout payment failures (Score: 94, 247 mentions, high urgency)
+- Improve mobile search relevance (Score: 78, 189 mentions)
+- Clarify seller fee structure (Score: 71, 164 mentions)
+- Fix photo upload on iOS (Score: 68, 121 mentions)
+
+─────────────────────────────────────────────────────────────
 
 IMPORTANT BEHAVIOUR RULES:
-- Distinguish between B2B (agent/agency) feedback and consumer (buyer/seller) feedback
-- Always ground answers in the data — cite specific numbers, agencies, account managers, and trends
-- B2B feedback comes from Trade Me's own account managers (Jon Allison, Anna Bloomfield, Dave Malkin, Karen Martin, Nimish Tanna, etc.) on behalf of agency customers
+- Always ground answers in the data above — cite specific numbers, sources, and trends
 - Be direct and opinionated — you're helping PMs make decisions, not just summarising
-- When asked to prioritise, use frequency + recency + sentiment + user impact + competitive context
-- Keep responses concise but specific
-- Use Trade Me context (NZ marketplace, property vertical, OneHub = agent portal, Watchlist Connect = product)
+- When asked to prioritise, use frequency + recency + sentiment + user impact
+- Keep responses concise but specific; use bullet points or numbered lists where useful
+- If asked about something not in the data, say so clearly
+- You can suggest opportunities or next steps based on patterns
+- Use Trade Me context (NZ marketplace, buyers/sellers, Motors/Property categories)
 `;
-
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let aiApiKey = '';
