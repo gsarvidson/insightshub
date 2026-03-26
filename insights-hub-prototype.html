@@ -250,6 +250,20 @@ td { padding: 9px 10px; vertical-align: top; }
 .input-row { padding: 1rem 1.5rem; border-top: 0.5px solid var(--color-border-tertiary); display: flex; gap: 8px; align-items: flex-end; }
 .chat-input { flex: 1; font-size: 13px; padding: 8px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); resize: none; min-height: 36px; font-family: var(--font-sans); }
 .send-btn { padding: 8px 16px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; }
+.send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── API Key Banner ── */
+.ai-key-banner { padding: 0.75rem 1.5rem; background: var(--color-background-warning); border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--color-text-warning); flex-shrink: 0; }
+.ai-key-banner input { flex: 1; font-size: 12px; padding: 4px 8px; border: 0.5px solid rgba(133,79,11,0.3); border-radius: 6px; background: white; color: var(--color-text-primary); font-family: monospace; }
+.ai-key-banner button { font-size: 11px; padding: 4px 10px; border: 0.5px solid rgba(133,79,11,0.4); border-radius: 6px; background: white; color: var(--color-text-warning); cursor: pointer; white-space: nowrap; }
+.ai-key-saved { background: var(--color-background-success) !important; color: var(--color-text-success) !important; }
+
+/* ── Typing indicator ── */
+.typing-indicator { display: flex; gap: 4px; align-items: center; padding: 2px 0; }
+.typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-text-tertiary); animation: typeBounce 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typeBounce { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-4px);opacity:1} }
 
 /* ═══════════════════════════════
    SIZING PAGE
@@ -533,9 +547,16 @@ body { background: var(--color-background-tertiary) !important; font-family: var
   ═══════════════════════════════ -->
   <div class="page" id="page-ai-assistant">
     <div class="chat-pane">
+      <!-- API Key Banner -->
+      <div class="ai-key-banner" id="aiKeyBanner">
+        <span>🔑</span>
+        <span style="white-space:nowrap">Anthropic API key:</span>
+        <input type="password" id="aiKeyInput" placeholder="sk-ant-..." autocomplete="off" />
+        <button onclick="saveAiApiKey()">Save for session</button>
+      </div>
       <div class="chat-header">
         <div class="chat-title">AI Assistant</div>
-        <div class="chat-sub">Ask anything about your feedback data</div>
+        <div class="chat-sub">Ask anything about your feedback data — powered by real Claude AI</div>
       </div>
       <div class="suggested">
         <div class="sug-label">Suggested questions</div>
@@ -1265,35 +1286,269 @@ document.getElementById('sizingSelect').addEventListener('change', function() {
 });
 
 // ══════════════════════════════════
-// AI ASSISTANT — CHAT INTERACTIONS
+// AI ASSISTANT — LIVE CLAUDE API
 // ══════════════════════════════════
-const canned = {
-  'What are the top issues this week?': 'This week\'s top issues are: (1) <strong>Checkout payment failures</strong> — 247 mentions, spiked 40% since Tuesday\'s deployment. (2) <strong>Mobile search relevance</strong> — 189 mentions, 3 weeks persistent. (3) <strong>Seller fee confusion</strong> — 164 mentions following the pricing change.',
-  'What do sellers need most?': 'Sellers\' top needs right now: (1) <strong>Fee structure clarity</strong> — 164 mentions, spike post-pricing change. (2) <strong>Photo upload fix</strong> — 121 mentions, iPhone users most affected. (3) <strong>Better messaging UX</strong> — 74 mentions, difficulty tracking buyer conversations.',
-  'Any new trends emerging?': 'Two new patterns detected this week: (1) <strong>Listing draft lost</strong> — 23 mentions in the last 48 hours, sellers losing work mid-edit. This is new and worth monitoring. (2) <strong>Payment method management</strong> — buyers struggling to update saved cards, 18 mentions.',
-  'Compare buyer vs seller pain points': 'Key differences: <strong>Buyers</strong> are most impacted by payment failures (247) and search relevance (189). <strong>Sellers</strong> are most impacted by fee confusion (164) and photo upload failures (121). Both segments report issues with messaging UX. Buyer sentiment is lower this week (58% positive vs 67% last week).',
-};
 
-function addMessage(role, html) {
+// ── Feedback context loaded as AI system prompt ──────────────────────────────
+const FEEDBACK_CONTEXT = `
+You are an AI assistant for Trade Me's internal Insights Hub tool. You help product managers and designers understand customer feedback, identify trends, and prioritise opportunities. Trade Me is New Zealand's largest online marketplace.
+
+You have access to the following mock feedback dataset (2,847 items, last 10 weeks):
+
+FEEDBACK SUMMARY DATA:
+─────────────────────────────────────────────────────────────
+Total feedback items: 2,847
+Date range: Last 10 weeks (Jan–Mar 2025)
+Sources: Salesforce Cases (42%, 1,204 items), CSAT Surveys (30%, 847), NPS Responses (18%, 512), Slack feedback (10%, 284)
+Overall sentiment: 62% positive, 24% negative, 14% neutral (down 4% vs last month)
+
+TOP THEMES (ranked by volume):
+1. Checkout payment failures — 247 mentions (↑ 40% this week, SPIKE)
+   - Sources: 58% Salesforce, 29% CSAT, 13% NPS
+   - Primarily buyers; mostly mobile (68%)
+   - Spike correlates with Tuesday deployment
+   - Sample quotes: "Payment keeps failing at checkout — tried 3 cards", "Card declined even though it has plenty of funds", "Payment page kept erroring on my phone"
+   - Sentiment: 94% negative
+
+2. Search relevance on mobile — 189 mentions (persistent, 3+ weeks)
+   - Sources: 41% NPS, 32% CSAT, 27% Slack
+   - Buyers searching for specific items getting irrelevant results
+   - Sample quotes: "Search results are useless on mobile", "Can't find anything I'm looking for", "Desktop search is fine but mobile is broken"
+   - Sentiment: 87% negative
+
+3. Seller fee confusion — 164 mentions (↑ since fee change announcement)
+   - Sources: 61% Salesforce, 22% NPS, 17% Slack
+   - Sellers uncertain about new fee structure, especially for Motors and Property
+   - Sample quotes: "Don't understand the new fee structure at all", "Was I charged the right amount?", "Need a simple breakdown of what I owe"
+   - Sentiment: 78% negative
+
+4. Photo upload errors — 121 mentions
+   - Sources: 54% Salesforce, 46% Slack
+   - Sellers can't upload listing photos; fails silently on iOS 17
+   - Sample quotes: "Photos just won't upload, no error message", "Works fine on Android, broken on iPhone"
+   - Sentiment: 91% negative
+
+5. Watchlist notifications — 97 mentions
+   - Sources: 67% NPS, 33% CSAT
+   - Items selling before notification arrives; buyers missing out
+   - Sample quotes: "Got the notification an hour after it sold", "Turned off notifs because they're always too late"
+   - Sentiment: 81% negative
+
+6. Buyer messaging UX — 74 mentions
+   - Sources: 48% CSAT, 36% NPS, 16% Slack
+   - Difficult to find message thread with seller; no read receipts
+   - Sentiment: 64% negative
+
+7. Listing draft lost — 52 mentions (NEW this week, emerging)
+   - Sources: 71% Salesforce, 29% Slack
+   - Sellers losing listing drafts after session timeout
+   - Sentiment: 96% negative
+
+8. Motors valuation confusion — 41 mentions
+   - Sources: 60% NPS, 40% CSAT
+   - Buyers unclear on how vehicle valuations are calculated
+
+BUYER vs SELLER BREAKDOWN:
+- Buyers (61%): Top pain points — payments, search, watchlist notifications
+- Sellers (39%): Top pain points — fee confusion, photo upload, listing drafts
+
+RECENT ALERTS:
+- Payment failure mentions up 40% in 24h (2 hours ago)
+- New theme detected: "listing draft lost" (5 hours ago)
+- Salesforce case volume above threshold (yesterday)
+
+OPPORTUNITIES ALREADY IDENTIFIED:
+- Fix checkout payment failures (Score: 94, 247 mentions, high urgency)
+- Improve mobile search relevance (Score: 78, 189 mentions)
+- Clarify seller fee structure (Score: 71, 164 mentions)
+- Fix photo upload on iOS (Score: 68, 121 mentions)
+
+─────────────────────────────────────────────────────────────
+
+IMPORTANT BEHAVIOUR RULES:
+- Always ground answers in the data above — cite specific numbers, sources, and trends
+- Be direct and opinionated — you're helping PMs make decisions, not just summarising
+- When asked to prioritise, use frequency + recency + sentiment + user impact
+- Keep responses concise but specific; use bullet points or numbered lists where useful
+- If asked about something not in the data, say so clearly
+- You can suggest opportunities or next steps based on patterns
+- Use Trade Me context (NZ marketplace, buyers/sellers, Motors/Property categories)
+`;
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let aiApiKey = '';
+let conversationHistory = [];
+let aiIsLoading = false;
+
+// ── API key management ────────────────────────────────────────────────────────
+function saveAiApiKey() {
+  const input = document.getElementById('aiKeyInput');
+  const key = (input.value || '').trim();
+  if (!key.startsWith('sk-ant-')) {
+    input.style.borderColor = 'var(--tm-pink)';
+    input.placeholder = 'Must start with sk-ant-…';
+    setTimeout(() => { input.style.borderColor = ''; input.placeholder = 'sk-ant-...'; }, 2000);
+    return;
+  }
+  aiApiKey = key;
+  const banner = document.getElementById('aiKeyBanner');
+  banner.className = 'ai-key-banner ai-key-saved';
+  banner.innerHTML = '<span>✓</span><span>API key saved — AI Assistant is live and connected to your feedback data</span>';
+}
+
+// ── Render simple markdown ────────────────────────────────────────────────────
+function renderMd(text) {
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // numbered lists
+  const lines = text.split('\n');
+  let out = '';
+  let inOl = false;
+  for (const line of lines) {
+    const olMatch = line.match(/^\d+\.\s+(.*)/);
+    if (olMatch) {
+      if (!inOl) { out += '<ol>'; inOl = true; }
+      out += `<li>${olMatch[1]}</li>`;
+    } else {
+      if (inOl) { out += '</ol>'; inOl = false; }
+      out += line ? `<p>${line}</p>` : '';
+    }
+  }
+  if (inOl) out += '</ol>';
+  return out;
+}
+
+// ── Add message bubble ────────────────────────────────────────────────────────
+function addMessage(role, content, isHtml = false) {
   const msgs = document.getElementById('chatMessages');
   const div = document.createElement('div');
   div.className = 'msg' + (role === 'user' ? ' user' : '');
+
+  const avatarEl = document.createElement('div');
+  avatarEl.className = `avatar ${role === 'user' ? 'av-user' : 'av-ai'}`;
+  avatarEl.textContent = role === 'user' ? 'You' : 'AI';
+
+  const bubbleEl = document.createElement('div');
+  bubbleEl.className = `bubble ${role === 'user' ? 'bubble-user' : 'bubble-ai'}`;
+
+  if (role === 'user') {
+    bubbleEl.textContent = content;
+  } else {
+    bubbleEl.innerHTML = isHtml ? content : renderMd(content);
+    // add action buttons
+    const actionRow = document.createElement('div');
+    actionRow.className = 'export-row';
+    actionRow.innerHTML = `
+      <button class="export-btn" onclick="navigator.clipboard.writeText(this.closest('.bubble').innerText).then(()=>{this.textContent='✓ Copied';setTimeout(()=>this.textContent='Copy summary',1500)})">Copy summary</button>
+      <button class="export-btn" data-goto="opportunities">Create opportunity →</button>
+      <button class="export-btn" data-goto="feedback">View raw feedback →</button>
+    `;
+    bubbleEl.appendChild(actionRow);
+    // wire nav buttons
+    actionRow.querySelectorAll('[data-goto]').forEach(btn => {
+      btn.addEventListener('click', () => navigate(btn.dataset.goto));
+    });
+  }
+
+  div.appendChild(avatarEl);
+  div.appendChild(bubbleEl);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return bubbleEl;
+}
+
+// ── Typing indicator ──────────────────────────────────────────────────────────
+function addTypingIndicator() {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.id = 'typingMsg';
   div.innerHTML = `
-    <div class="avatar ${role==='user'?'av-user':'av-ai'}">${role==='user'?'JR':'AI'}</div>
-    <div class="bubble ${role==='user'?'bubble-user':'bubble-ai'}">${html}</div>
+    <div class="avatar av-ai">AI</div>
+    <div class="bubble bubble-ai"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
   `;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
+  return div;
 }
 
+// ── Send message ──────────────────────────────────────────────────────────────
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('chatSend');
+  const text = (input.value || '').trim();
+  if (!text || aiIsLoading) return;
+
+  if (!aiApiKey) {
+    const banner = document.getElementById('aiKeyBanner');
+    banner.style.outline = '2px solid var(--tm-pink)';
+    banner.querySelector('input') && banner.querySelector('input').focus();
+    setTimeout(() => banner.style.outline = '', 2000);
+    return;
+  }
+
+  input.value = '';
+  addMessage('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+
+  aiIsLoading = true;
+  sendBtn.disabled = true;
+  sendBtn.textContent = '...';
+
+  const typingMsg = addTypingIndicator();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': aiApiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        system: FEEDBACK_CONTEXT,
+        messages: conversationHistory
+      })
+    });
+
+    typingMsg.remove();
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API error ${response.status}`);
+    }
+
+    const data = await response.json();
+    const assistantText = data.content?.find(b => b.type === 'text')?.text || '';
+
+    addMessage('assistant', assistantText);
+    conversationHistory.push({ role: 'assistant', content: assistantText });
+
+  } catch (err) {
+    typingMsg.remove();
+    const msgs = document.getElementById('chatMessages');
+    const errDiv = document.createElement('div');
+    errDiv.className = 'msg';
+    const msg = err.message.includes('401') ? 'Invalid API key — check your key and try again.'
+      : err.message.includes('TypeError') || err.message.includes('network') ? 'Network error. Make sure you\'re connected.'
+      : `Error: ${err.message}`;
+    errDiv.innerHTML = `<div class="avatar av-ai">AI</div><div class="bubble bubble-ai" style="color:var(--tm-pink)">⚠️ ${msg}</div>`;
+    msgs.appendChild(errDiv);
+    msgs.scrollTop = msgs.scrollHeight;
+  } finally {
+    aiIsLoading = false;
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Send';
+  }
+}
+
+// ── Suggested pills ───────────────────────────────────────────────────────────
 document.querySelectorAll('.sug-pill[data-question]').forEach(pill => {
   pill.addEventListener('click', () => {
-    const q = pill.dataset.question;
-    addMessage('user', q);
-    setTimeout(() => {
-      const ans = canned[q] || 'Let me look into that across your feedback sources…';
-      addMessage('ai', ans);
-    }, 600);
+    document.getElementById('chatInput').value = pill.dataset.question;
+    sendChat();
   });
 });
 
@@ -1301,17 +1556,6 @@ document.getElementById('chatSend').addEventListener('click', sendChat);
 document.getElementById('chatInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
 });
-
-function sendChat() {
-  const input = document.getElementById('chatInput');
-  const val = input.value.trim();
-  if (!val) return;
-  addMessage('user', val);
-  input.value = '';
-  setTimeout(() => {
-    addMessage('ai', 'I\'ve searched across all your feedback sources. Based on the last 30 days, I can see patterns related to your question. Would you like me to create an opportunity from this data, or dig deeper into a specific source?<div class="export-row"><button class="export-btn" data-goto="opportunities">Create opportunity →</button><button class="export-btn" data-goto="feedback">View raw feedback →</button></div>');
-  }, 700);
-}
 
 // Export buttons in existing chat bubbles
 document.querySelectorAll('.export-btn[data-goto]').forEach(btn => {
