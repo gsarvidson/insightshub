@@ -54,7 +54,8 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
 .metrics { display: grid; gap: 12px; margin-bottom: 1.5rem; }
 .metrics-4 { grid-template-columns: repeat(4, 1fr); }
 .metrics-5 { grid-template-columns: repeat(5, 1fr); }
-.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.875rem 1rem; }
+.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.875rem 1rem; border-left: 3px solid var(--tm-blurple); transition: box-shadow 0.15s; }
+.metric:hover { box-shadow: 0 2px 8px rgba(72,84,211,0.12); }
 .metric-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
 .metric-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
 .metric-delta { font-size: 12px; margin-top: 4px; }
@@ -127,10 +128,24 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
 .s-review { background: #FAEEDA; color: #854F0B; }
 .s-road { background: #EAF3DE; color: #3B6D11; }
 .s-new { background: #FCEBEB; color: #A32D2D; }
+.s-backlog { background: #F4F4FC; color: #5a5751; }
+.s-done { background: #D1D4F4; color: #0916A6; }
+
+/* Status change control in detail pane */
+.detail-status-wrap { position: relative; display: inline-block; }
+.detail-status-pill { font-size: 12px; padding: 3px 10px; border-radius: 10px; font-weight: 500; cursor: pointer; border: 1.5px solid transparent; transition: border-color 0.15s, box-shadow 0.15s; user-select: none; display: inline-flex; align-items: center; gap: 5px; }
+.detail-status-pill:hover { border-color: rgba(0,0,0,0.18); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.detail-status-pill .caret { font-size: 9px; opacity: 0.6; }
+.status-dropdown { position: absolute; top: calc(100% + 4px); left: 0; background: #fff; border: 0.5px solid var(--color-border-secondary); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 100; min-width: 160px; padding: 4px; display: none; }
+.status-dropdown.open { display: block; }
+.status-dropdown-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--color-text-primary); transition: background 0.1s; }
+.status-dropdown-item:hover { background: var(--color-background-secondary); }
+.status-dropdown-item .swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.status-dropdown-item.active-item { font-weight: 600; }
 .opp-meta { display: flex; align-items: center; gap: 12px; }
 .meta-item { font-size: 11px; color: var(--color-text-secondary); }
-.score-bar-wrap { width: 60px; height: 4px; background: var(--color-background-secondary); border-radius: 2px; overflow: hidden; }
-.score-bar { height: 100%; border-radius: 2px; }
+.score-bar-wrap { width: 60px; height: 5px; background: var(--color-background-tertiary); border-radius: 3px; overflow: hidden; }
+.score-bar { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
 
 .detail-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.25rem; }
 .detail-sub { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 1rem; }
@@ -274,12 +289,12 @@ td { padding: 9px 10px; vertical-align: top; }
 .action-btn { font-size: 12px; padding: 6px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; }
 .trend-chart { height: 120px; display: flex; align-items: flex-end; gap: 4px; padding-top: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 8px; }
 .t-bar { flex: 1; border-radius: 2px 2px 0 0; }
-.seg-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.seg-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
 .seg-row:last-child { border-bottom: none; }
-.seg-label { font-size: 12px; color: var(--color-text-primary); flex: 1; }
-.seg-bar-wrap { width: 70px; height: 6px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden; }
-.seg-bar { height: 100%; border-radius: 3px; }
-.seg-pct { font-size: 11px; color: var(--color-text-secondary); width: 28px; text-align: right; }
+.seg-label { font-size: 12px; color: var(--color-text-primary); min-width: 100px; }
+.seg-bar-wrap { flex: 1; margin: 0 8px; height: 8px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+.seg-bar { height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+.seg-pct { font-size: 11px; color: var(--color-text-secondary); width: 28px; text-align: right; font-weight: 500; }
 .freq-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
 .freq-row:last-child { border-bottom: none; }
 .freq-label { font-size: 12px; color: var(--color-text-secondary); }
@@ -349,7 +364,6 @@ td { padding: 9px 10px; vertical-align: top; }
 .ai-label { color: var(--tm-kowhai) !important; font-family: var(--font-display) !important; }
 .ai-text { color: rgba(255,255,255,0.9) !important; }
 .ai-text strong { color: var(--tm-kowhai) !important; }
-.metric { border-top: 3px solid var(--tm-blurple) !important; }
 .metric-value { font-family: var(--font-display) !important; font-weight: 700 !important; }
 body { background: var(--color-background-tertiary) !important; font-family: var(--font-sans) !important; }
 .shell { box-shadow: 0 4px 32px rgba(9,22,166,0.12) !important; }
@@ -412,29 +426,23 @@ body { background: var(--color-background-tertiary) !important; font-family: var
           </div>
           <div class="card">
             <div class="card-title">Feedback volume — last 7 days</div>
-            <div class="chart-area">
-              <div class="bar" style="height:35%;background:#B5D4F4"></div>
-              <div class="bar" style="height:55%;background:#85B7EB"></div>
-              <div class="bar" style="height:45%;background:#85B7EB"></div>
-              <div class="bar" style="height:70%;background:#378ADD"></div>
-              <div class="bar" style="height:60%;background:#378ADD"></div>
-              <div class="bar" style="height:80%;background:#185FA5"></div>
-              <div class="bar" style="height:65%;background:#185FA5"></div>
-            </div>
-            <div class="chart-labels">
-              <div class="chart-label">M</div><div class="chart-label">T</div><div class="chart-label">W</div><div class="chart-label">T</div><div class="chart-label">F</div><div class="chart-label">S</div><div class="chart-label">S</div>
+            <div style="position:relative;height:110px;margin-bottom:4px">
+              <canvas id="dashVolumeChart"></canvas>
             </div>
           </div>
         </div>
         <div>
           <div class="card">
             <div class="card-title">Alerts</div>
-            <div class="alert-row"><div class="alert-dot" style="background:#E24B4A"></div><div><div class="alert-text">Payment failure mentions up 40% in 24h</div><div class="alert-time">2 hours ago</div></div></div>
-            <div class="alert-row"><div class="alert-dot" style="background:#EF9F27"></div><div><div class="alert-text">New theme detected: "listing draft lost"</div><div class="alert-time">5 hours ago</div></div></div>
-            <div class="alert-row"><div class="alert-dot" style="background:#378ADD"></div><div><div class="alert-text">Salesforce case volume above threshold</div><div class="alert-time">Yesterday</div></div></div>
+            <div class="alert-row" style="cursor:pointer" onclick="navigate('feedback')"><div class="alert-dot" style="background:#E24B4A"></div><div><div class="alert-text">Payment failure mentions up 40% in 24h</div><div class="alert-time">2 hours ago · Click to explore</div></div></div>
+            <div class="alert-row" style="cursor:pointer" onclick="navigate('opportunities')"><div class="alert-dot" style="background:#EF9F27"></div><div><div class="alert-text">New theme detected: "listing draft lost"</div><div class="alert-time">5 hours ago · Click to explore</div></div></div>
+            <div class="alert-row" style="cursor:pointer" onclick="navigate('feedback')"><div class="alert-dot" style="background:#378ADD"></div><div><div class="alert-text">Salesforce case volume above threshold</div><div class="alert-time">Yesterday · Click to explore</div></div></div>
           </div>
           <div class="card">
             <div class="card-title">Feedback by source</div>
+            <div style="position:relative;height:120px;margin-bottom:10px">
+              <canvas id="dashSourceChart"></canvas>
+            </div>
             <div class="source-row"><div class="source-dot" style="background:#E24B4A"></div><span class="source-name">Salesforce cases</span><span class="source-count">1,204</span><span class="source-pct">42%</span></div>
             <div class="source-row"><div class="source-dot" style="background:#378ADD"></div><span class="source-name">CSAT surveys</span><span class="source-count">847</span><span class="source-pct">30%</span></div>
             <div class="source-row"><div class="source-dot" style="background:#EF9F27"></div><span class="source-name">NPS responses</span><span class="source-count">512</span><span class="source-pct">18%</span></div>
@@ -452,11 +460,14 @@ body { background: var(--color-background-tertiary) !important; font-family: var
     <div class="opp-layout">
       <div class="list-pane">
         <div class="page-title">Opportunities</div>
-        <div class="page-sub">These opportunities have been identified from the feedback provided</div>
+        <div class="page-sub">Auto AI generated opportunities based on feedback captured</div>
         <div class="toolbar">
-          <button class="tb-btn active">All</button>
-          <button class="tb-btn">Under review</button>
-          <button class="tb-btn">On roadmap</button>
+          <button class="tb-btn active" data-filter="All">All</button>
+          <button class="tb-btn" data-filter="Urgent">Urgent</button>
+          <button class="tb-btn" data-filter="Under review">Under review</button>
+          <button class="tb-btn" data-filter="On roadmap">On roadmap</button>
+          <button class="tb-btn" data-filter="Backlog">Backlog</button>
+          <button class="tb-btn" data-filter="Done">Done</button>
           <div class="spacer"></div>
           <button class="new-btn">+ New</button>
         </div>
@@ -1251,7 +1262,10 @@ function navigate(pageId) {
     setTimeout(initFeedbackChart, 50);
   }
   if (pageId === 'sizing') {
-    renderSizing(document.getElementById('sizingSelect').value);
+    setTimeout(() => renderSizing(document.getElementById('sizingSelect').value), 50);
+  }
+  if (pageId === 'dashboard') {
+    setTimeout(initDashboardCharts, 50);
   }
 }
 
@@ -1274,14 +1288,61 @@ document.querySelectorAll('.spark-row[data-goto]').forEach(row => {
 // ══════════════════════════════════
 // OPPORTUNITIES
 // ══════════════════════════════════
+
+// Tracks current status per opp key (seeded from card pills)
+const oppStatuses = {
+  checkout: 'Urgent', search: 'Under review', fees: 'Under review',
+  photos: 'On roadmap', watchlist: 'Under review', messaging: 'On roadmap',
+  legalCompliance: 'Urgent', watchlistConnect: 'Under review',
+  reportingAutomation: 'Under review', multiAgentEnquiry: 'Under review',
+  findAnAgentAccuracy: 'Under review', listingCategoryFlexibility: 'On roadmap',
+};
+
 function renderOppDetail(key) {
   const d = oppData[key];
   const detail = document.getElementById('opp-detail');
+  
+  // Generate a plausible trend for B2B opps
+  const isSizing = sizingData[key];
+  const trendBars = isSizing ? sizingData[key].bars : [2,3,2,4,3,5,4,6,5,7];
+  const maxT = Math.max(...trendBars);
+
+  const statusMeta = {
+    'Urgent':       { cls: 's-new',     swatch: '#E24B4A' },
+    'Under review': { cls: 's-review',  swatch: '#EF9F27' },
+    'On roadmap':   { cls: 's-road',    swatch: '#1D9E75' },
+    'Backlog':      { cls: 's-backlog', swatch: '#9b9b9b' },
+    'Done':         { cls: 's-done',    swatch: '#4854D3' },
+  };
+  const currentStatus = oppStatuses[key] || 'Under review';
+  const sm = statusMeta[currentStatus];
+
   detail.innerHTML = `
-    <div class="detail-title">${d.title}</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
+      <div class="detail-title" style="margin-bottom:0">${d.title}</div>
+      <div class="detail-status-wrap" id="statusWrap">
+        <div class="detail-status-pill ${sm.cls}" id="statusPill" title="Change status">
+          ${currentStatus} <span class="caret">▾</span>
+        </div>
+        <div class="status-dropdown" id="statusDropdown">
+          ${Object.entries(statusMeta).map(([label, meta]) => `
+            <div class="status-dropdown-item ${label === currentStatus ? 'active-item' : ''}" data-status="${label}">
+              <span class="swatch" style="background:${meta.swatch}"></span>${label}
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
     <div class="detail-sub">${d.sub}</div>
     <div class="stat-row">
       ${d.stats.map(s => `<div class="stat-box"><div class="stat-label">${s.label}</div><div class="stat-val" style="${s.color?'color:'+s.color:''}">${s.val}</div></div>`).join('')}
+    </div>
+    <div class="section-label" style="margin-bottom:6px">Mention trend (10 weeks)</div>
+    <div style="display:flex;align-items:flex-end;gap:3px;height:40px;margin-bottom:1rem;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)">
+      ${trendBars.map((b,i) => {
+        const h = Math.round((b/maxT)*100);
+        const isLast = i === trendBars.length-1;
+        return `<div style="flex:1;height:${h}%;border-radius:2px 2px 0 0;background:${isLast?'#E24B4A':'var(--tm-blurple-light)'};transition:height 0.3s"></div>`;
+      }).join('')}
     </div>
     <div class="section-label" style="margin-bottom:6px">Sources</div>
     <div style="margin-bottom:1rem">${d.sources.map(s => `<span class="source-chip">${s.name} (${s.count})</span>`).join('')}</div>
@@ -1290,7 +1351,7 @@ function renderOppDetail(key) {
     <div class="section-label">Sample feedback</div>
     ${d.feedback.map(f => `<div class="feedback-item"><div class="fb-source">${f.source}</div><div class="fb-text">${f.text}</div></div>`).join('')}
     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-      <span class="action-link" data-goto="feedback">View all feedback →</span>
+      <span class="action-link" data-goto="feedback">View related feedback →</span>
       <span class="action-link" data-goto="sizing" style="margin-left:8px">Size this opportunity →</span>
     </div>
     <div style="margin-top:1rem;display:flex;gap:8px;flex-wrap:wrap">
@@ -1298,6 +1359,55 @@ function renderOppDetail(key) {
       <button class="act-btn">Create Jira issue</button>
     </div>
   `;
+
+  // --- Status dropdown wiring ---
+  const pill = detail.querySelector('#statusPill');
+  const dropdown = detail.querySelector('#statusDropdown');
+
+  pill.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('open');
+  });
+
+  document.addEventListener('click', function closeStatus(e) {
+    if (!detail.querySelector('#statusWrap')?.contains(e.target)) {
+      dropdown.classList.remove('open');
+      document.removeEventListener('click', closeStatus);
+    }
+  });
+
+  dropdown.querySelectorAll('.status-dropdown-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const newStatus = item.dataset.status;
+      oppStatuses[key] = newStatus;
+      dropdown.classList.remove('open');
+
+      // Update detail pill
+      const allCls = ['s-new','s-review','s-road','s-backlog','s-done'];
+      const newMeta = statusMeta[newStatus];
+      allCls.forEach(c => pill.classList.remove(c));
+      pill.classList.add(newMeta.cls);
+      pill.innerHTML = `${newStatus} <span class="caret">▾</span>`;
+
+      // Update the card list pill
+      const card = document.querySelector(`.opp-card[data-opp="${key}"]`);
+      if (card) {
+        const cardPill = card.querySelector('.status-pill');
+        if (cardPill) {
+          allCls.forEach(c => cardPill.classList.remove(c));
+          cardPill.classList.add(newMeta.cls);
+          cardPill.textContent = newStatus;
+        }
+      }
+
+      // Update active-item highlight in dropdown
+      dropdown.querySelectorAll('.status-dropdown-item').forEach(i => {
+        i.classList.toggle('active-item', i.dataset.status === newStatus);
+      });
+    });
+  });
+  // --- end status wiring ---
 }
 
 document.querySelectorAll('.opp-card').forEach(card => {
@@ -1305,6 +1415,30 @@ document.querySelectorAll('.opp-card').forEach(card => {
     document.querySelectorAll('.opp-card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
     renderOppDetail(card.dataset.opp);
+  });
+});
+
+// ── Status filter buttons ──
+document.querySelectorAll('.toolbar .tb-btn[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.toolbar .tb-btn[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    let firstVisible = null;
+    document.querySelectorAll('.opp-card').forEach(card => {
+      const cardStatus = oppStatuses[card.dataset.opp] || 'Under review';
+      const show = filter === 'All' || cardStatus === filter;
+      card.style.display = show ? '' : 'none';
+      if (show && !firstVisible) firstVisible = card;
+    });
+    // Select & render first visible card, or clear detail if none
+    document.querySelectorAll('.opp-card').forEach(c => c.classList.remove('selected'));
+    if (firstVisible) {
+      firstVisible.classList.add('selected');
+      renderOppDetail(firstVisible.dataset.opp);
+    } else {
+      document.getElementById('opp-detail').innerHTML = '<div style="padding:2rem;color:var(--color-text-tertiary);font-size:13px;text-align:center">No opportunities match this filter.</div>';
+    }
   });
 });
 
@@ -1498,19 +1632,13 @@ function renderSizing(key) {
     </div>
   `).join('');
 
-  const maxBar = Math.max(...d.bars);
   const chartsEl = document.getElementById('sizingCharts');
   chartsEl.innerHTML = `
     <div class="card">
       <div class="card-title">Mention trend — last 10 weeks</div>
-      <div class="trend-chart">
-        ${d.bars.map((b,i) => {
-          const pct = Math.round((b/maxBar)*100);
-          const colors = ['#B5D4F4','#B5D4F4','#85B7EB','#85B7EB','#85B7EB','#378ADD','#378ADD','#378ADD','#185FA5','#E24B4A'];
-          return `<div class="t-bar" style="height:${pct}%;background:${colors[i]}"></div>`;
-        }).join('')}
+      <div style="position:relative;height:160px;margin-bottom:4px">
+        <canvas id="sizingTrendChart"></canvas>
       </div>
-      <div class="chart-labels">${['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10'].map(w=>`<div class="chart-label">${w}</div>`).join('')}</div>
     </div>
     <div>
       <div class="card">
@@ -1518,24 +1646,90 @@ function renderSizing(key) {
         ${d.segments.map(s => `
           <div class="seg-row">
             <span class="seg-label">${s.label}</span>
-            <div class="seg-bar-wrap"><div class="seg-bar" style="width:${s.pct}%;background:${s.color}"></div></div>
+            <div class="seg-bar-wrap" style="flex:1;margin:0 8px;height:8px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden">
+              <div class="seg-bar" style="width:${s.pct}%;background:${s.color};height:100%;border-radius:4px;transition:width 0.6s ease"></div>
+            </div>
             <span class="seg-pct">${s.pct}%</span>
           </div>
         `).join('')}
       </div>
       <div class="card">
         <div class="card-title">Frequency by source</div>
-        ${d.sources.map(s => `<div class="freq-row"><span class="freq-label">${s.label}</span><span class="freq-val">${s.val}</span></div>`).join('')}
+        <div style="position:relative;height:130px;margin-bottom:12px">
+          <canvas id="sizingSourceChart"></canvas>
+        </div>
         <div class="confidence">
           <span style="font-size:12px;color:#854F0B">Confidence</span>
           <div class="conf-dots">
-            ${[1,2,3,4,5].map(n=>`<div class="conf-dot" style="background:${n<=4?'#EF9F27':'#f5f5f3'}"></div>`).join('')}
+            ${[1,2,3,4,5].map(n=>`<div class="conf-dot" style="background:${n<=4?'#EF9F27':'var(--color-background-tertiary)'}"></div>`).join('')}
           </div>
           <span style="font-size:11px;color:#854F0B">High (${d.sources.length} sources)</span>
         </div>
       </div>
     </div>
   `;
+
+  // Trend bar chart
+  const tctx = document.getElementById('sizingTrendChart').getContext('2d');
+  const barColors = d.bars.map((b,i) => {
+    const maxB = Math.max(...d.bars);
+    if (b === maxB) return '#E24B4A';
+    if (i >= 7) return '#185FA5';
+    if (i >= 4) return '#378ADD';
+    return '#B5D4F4';
+  });
+  new Chart(tctx, {
+    type: 'bar',
+    data: {
+      labels: ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10'],
+      datasets: [{
+        data: d.bars,
+        backgroundColor: barColors,
+        borderRadius: 3,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: '#fff', borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1,
+        titleColor: '#2F2C28', bodyColor: '#5a5751', padding: 8,
+        callbacks: { label: ctx => ` ${ctx.parsed.y} mentions` }
+      }},
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#9b9b9b' }, border: { display: false } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)', drawTicks: false }, ticks: { font: { size: 10 }, color: '#9b9b9b', padding: 4 }, border: { display: false }, beginAtZero: true }
+      }
+    }
+  });
+
+  // Source horizontal bar chart
+  const sctx = document.getElementById('sizingSourceChart').getContext('2d');
+  new Chart(sctx, {
+    type: 'bar',
+    data: {
+      labels: d.sources.map(s => s.label),
+      datasets: [{
+        data: d.sources.map(s => s.val),
+        backgroundColor: ['#E24B4A','#378ADD','#EF9F27','#1D9E75'].slice(0, d.sources.length),
+        borderRadius: 3,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: '#fff', borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1,
+        titleColor: '#2F2C28', bodyColor: '#5a5751', padding: 8,
+        callbacks: { label: ctx => ` ${ctx.parsed.x} mentions` }
+      }},
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.05)', drawTicks: false }, ticks: { font: { size: 10 }, color: '#9b9b9b' }, border: { display: false }, beginAtZero: true },
+        y: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#2F2C28' }, border: { display: false } }
+      }
+    }
+  });
 }
 
 document.getElementById('sizingSelect').addEventListener('change', function() {
@@ -1820,8 +2014,126 @@ document.querySelectorAll('.export-btn[data-goto]').forEach(btn => {
 });
 
 // ══════════════════════════════════
-// SOURCES PAGE TABS
+// DASHBOARD CHARTS
 // ══════════════════════════════════
+let dashVolumeChartInst = null, dashSourceChartInst = null;
+function initDashboardCharts() {
+  // Volume bar chart
+  const vctx = document.getElementById('dashVolumeChart');
+  if (!vctx) return;
+  if (dashVolumeChartInst) { dashVolumeChartInst.destroy(); dashVolumeChartInst = null; }
+  dashVolumeChartInst = new Chart(vctx.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets: [{
+        label: 'Feedback items',
+        data: [142, 198, 167, 251, 219, 187, 183],
+        backgroundColor: ['#B5D4F4','#E24B4A','#85B7EB','#185FA5','#378ADD','#378ADD','#85B7EB'],
+        borderRadius: 4,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: '#fff', borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1,
+        titleColor: '#2F2C28', bodyColor: '#5a5751', padding: 8,
+        callbacks: { label: ctx => ` ${ctx.parsed.y} items` }
+      }},
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#9b9b9b' }, border: { display: false } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)', drawTicks: false }, ticks: { font: { size: 11 }, color: '#9b9b9b', padding: 4 }, border: { display: false }, beginAtZero: true }
+      }
+    }
+  });
+
+  // Source donut chart
+  const sctx = document.getElementById('dashSourceChart');
+  if (!sctx) return;
+  if (dashSourceChartInst) { dashSourceChartInst.destroy(); dashSourceChartInst = null; }
+  dashSourceChartInst = new Chart(sctx.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Salesforce', 'CSAT', 'NPS', 'Slack'],
+      datasets: [{
+        data: [1204, 847, 512, 284],
+        backgroundColor: ['#E24B4A','#378ADD','#EF9F27','#1D9E75'],
+        borderWidth: 2,
+        borderColor: '#fff',
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#fff', borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1,
+          titleColor: '#2F2C28', bodyColor: '#5a5751', padding: 8,
+          callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString()} items` }
+        }
+      }
+    }
+  });
+}
+
+// Init on first load
+initDashboardCharts();
+
+// ══════════════════════════════════
+// FEEDBACK FILTER INTERACTIONS
+// ══════════════════════════════════
+(function() {
+  const allRows = Array.from(document.querySelectorAll('#feedbackTableBody tr'));
+
+  function applyFilters() {
+    const sourceVal = document.querySelector('.filter-select:nth-of-type(1)')?.value || 'All sources';
+    const themeVal = document.querySelector('.filter-select:nth-of-type(2)')?.value || 'All themes';
+    const sentVal = document.querySelector('.filter-select:nth-of-type(3)')?.value || 'All sentiment';
+    const searchVal = (document.querySelector('.search-input')?.value || '').toLowerCase();
+
+    let visible = 0;
+    allRows.forEach(row => {
+      const srcCell = row.querySelector('.source-badge');
+      const themeCell = row.querySelector('td:nth-child(5)');
+      const sentCell = row.querySelector('.sentiment');
+      const textCell = row.querySelector('.cell-text');
+
+      let show = true;
+      if (sourceVal !== 'All sources' && srcCell && !srcCell.textContent.toLowerCase().includes(sourceVal.toLowerCase())) show = false;
+      if (themeVal !== 'All themes' && themeCell && !themeCell.textContent.toLowerCase().includes(themeVal.toLowerCase())) show = false;
+      if (sentVal !== 'All sentiment' && sentCell && !sentCell.textContent.toLowerCase().includes(sentVal.toLowerCase())) show = false;
+      if (searchVal && textCell && !textCell.textContent.toLowerCase().includes(searchVal)) show = false;
+
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    // Update active filter chips
+    const activeRow = document.querySelector('.active-filters-row');
+    if (activeRow) {
+      const chips = [];
+      if (sourceVal !== 'All sources') chips.push(`<span class="active-filter">Source: ${sourceVal} <span onclick="this.closest('.active-filter').remove()" style="cursor:pointer;margin-left:2px">×</span></span>`);
+      if (themeVal !== 'All themes') chips.push(`<span class="active-filter">Theme: ${themeVal} <span onclick="this.closest('.active-filter').remove()" style="cursor:pointer;margin-left:2px">×</span></span>`);
+      if (sentVal !== 'All sentiment') chips.push(`<span class="active-filter">Sentiment: ${sentVal} <span onclick="this.closest('.active-filter').remove()" style="cursor:pointer;margin-left:2px">×</span></span>`);
+      activeRow.innerHTML = chips.length ? `<span style="font-size:12px;color:var(--color-text-secondary)">Active filters:</span>${chips.join('')}` : '';
+
+      // Update count
+      const countEl = document.querySelector('#page-feedback .page-sub');
+      if (countEl) countEl.textContent = `${visible} items · last 10 weeks · filtered`;
+    }
+  }
+
+  document.querySelectorAll('.filter-select').forEach(sel => sel.addEventListener('change', applyFilters));
+  document.querySelector('.search-input')?.addEventListener('input', applyFilters);
+  document.querySelector('.clear-btn')?.addEventListener('click', () => {
+    document.querySelectorAll('.filter-select').forEach(sel => sel.selectedIndex = 0);
+    const si = document.querySelector('.search-input');
+    if (si) si.value = '';
+    applyFilters();
+  });
+})();
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
