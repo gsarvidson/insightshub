@@ -109,9 +109,12 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
 /* ═══════════════════════════════
    OPPORTUNITIES PAGE
 ═══════════════════════════════ */
-.opp-layout { display: grid; grid-template-columns: 1fr 340px; flex: 1; overflow: hidden; }
-.list-pane { padding: 1.5rem; border-right: 0.5px solid var(--color-border-tertiary); overflow: auto; }
-.detail-pane { padding: 1.5rem; overflow: auto; background: var(--color-background-primary); }
+.opp-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.list-pane { padding: 1.5rem; overflow: auto; flex: 1; }
+.opp-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+.opp-detail-overlay.active { opacity: 1; pointer-events: auto; }
+.detail-pane { position: fixed; top: 0; right: 0; width: 420px; max-width: 92vw; height: 100vh; padding: 1.5rem; overflow: auto; background: var(--color-background-primary); z-index: 201; transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); box-shadow: -4px 0 24px rgba(0,0,0,0.15); }
+.detail-pane.open { transform: translateX(0); }
 
 .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
 .tb-btn { font-size: 12px; padding: 5px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; }
@@ -527,6 +530,8 @@ body { background: var(--color-background-tertiary) !important; font-family: var
       </div>
     </div>
   </div>
+  <!-- Opp detail overlay -->
+  <div class="opp-detail-overlay" id="oppDetailOverlay"></div>
 
   <!-- ═══════════════════════════════
        PAGE: FEEDBACK EXPLORER
@@ -1322,6 +1327,9 @@ function renderOppDetail(key) {
   const sm = statusMeta[currentStatus];
 
   detail.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:8px">
+      <button class="close-btn" id="closeOppDetail" style="font-size:18px;line-height:1">×</button>
+    </div>
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
       <div class="detail-title" style="margin-bottom:0">${d.title}</div>
       <div class="detail-status-wrap" id="statusWrap">
@@ -1412,6 +1420,25 @@ function renderOppDetail(key) {
     });
   });
   // --- end status wiring ---
+
+  // Open the detail pane as overlay
+  const overlay = document.getElementById('oppDetailOverlay');
+  requestAnimationFrame(() => {
+    detail.classList.add('open');
+    overlay.classList.add('active');
+  });
+
+  document.getElementById('closeOppDetail').addEventListener('click', () => {
+    detail.classList.remove('open');
+    overlay.classList.remove('active');
+    document.querySelectorAll('.opp-card').forEach(c => c.classList.remove('selected'));
+  });
+
+  overlay.onclick = () => {
+    detail.classList.remove('open');
+    overlay.classList.remove('active');
+    document.querySelectorAll('.opp-card').forEach(c => c.classList.remove('selected'));
+  };
 }
 
 document.querySelectorAll('.opp-card').forEach(card => {
@@ -1435,18 +1462,17 @@ document.querySelectorAll('.toolbar .tb-btn[data-filter]').forEach(btn => {
       card.style.display = show ? '' : 'none';
       if (show && !firstVisible) firstVisible = card;
     });
-    // Select & render first visible card, or clear detail if none
+    // Close any open detail pane when filter changes
+    document.getElementById('opp-detail').classList.remove('open');
+    document.getElementById('oppDetailOverlay').classList.remove('active');
     document.querySelectorAll('.opp-card').forEach(c => c.classList.remove('selected'));
-    if (firstVisible) {
-      firstVisible.classList.add('selected');
-      renderOppDetail(firstVisible.dataset.opp);
-    } else {
+    if (!firstVisible) {
       document.getElementById('opp-detail').innerHTML = '<div style="padding:2rem;color:var(--color-text-tertiary);font-size:13px;text-align:center">No opportunities match this filter.</div>';
     }
   });
 });
 
-renderOppDetail('checkout');
+// Don't auto-open detail on load — user clicks a card to open
 
 // ══════════════════════════════════
 // FEEDBACK TABLE + DRAWER
