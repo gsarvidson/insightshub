@@ -1555,7 +1555,7 @@ function renderDrawer(idx) {
         <button class="act-btn">Copy verbatim</button>
         <button class="act-btn">Link to opportunity</button>
         <button class="act-btn">Flag for review</button>
-        <button class="act-btn act-btn-primary">View in Salesforce →</button>
+        ${row.src === 'sf' ? `<button class="act-btn act-btn-primary">View in Salesforce →</button>` : row.src === 'slack' ? `<button class="act-btn act-btn-primary">View in Slack →</button>` : ''}
       </div>
     </div>
   `;
