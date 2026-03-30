@@ -1060,6 +1060,13 @@ function showSupabaseBanner() {
 
 // Sync an opportunity status update back to Supabase
 async function syncStatusToSupabase(oppKey, newStatus) {
+  // Always persist to localStorage so status survives page refresh
+  try {
+    const stored = JSON.parse(localStorage.getItem('ih_opp_statuses') || '{}');
+    stored[oppKey] = newStatus;
+    localStorage.setItem('ih_opp_statuses', JSON.stringify(stored));
+  } catch(e) { /* ignore */ }
+
   if (!sbClient) return;
   const { error } = await sbClient
     .from('opportunities')
@@ -2056,6 +2063,12 @@ const oppStatuses = {
   reportingAutomation: 'Under review', multiAgentEnquiry: 'Under review',
   findAnAgentAccuracy: 'Under review', listingCategoryFlexibility: 'On roadmap',
 };
+
+// Restore any previously saved statuses from localStorage
+try {
+  const stored = JSON.parse(localStorage.getItem('ih_opp_statuses') || '{}');
+  Object.assign(oppStatuses, stored);
+} catch(e) { /* ignore */ }
 
 function renderOppDetail(key) {
   const d = oppData[key];
