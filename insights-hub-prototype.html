@@ -695,16 +695,7 @@ body { background: var(--color-background-tertiary) !important; font-family: var
       <div class="page-sub">Quantify impact before committing to the roadmap</div>
       <div class="opp-selector">
         <span class="sel-label">Opportunity</span>
-        <select class="opp-select" id="sizingSelect">
-          <option value="checkout">Fix checkout payment failures</option>
-          <option value="search">Improve mobile search relevance</option>
-          <option value="fees">Clarify seller fee structure</option>
-          <option value="b2bPricing">Address B2B pricing concerns &amp; value</option>
-          <option value="propertyRedesign">Property redesign — navigation &amp; UX</option>
-          <option value="motorsListingEdit">Motors listing — edit &amp; extend UX</option>
-          <option value="motorsPhotos">Motors listing — photo upload failures</option>
-          <option value="motorsPricing">Motors listing — pricing &amp; value</option>
-        </select>
+        <select class="opp-select" id="sizingSelect"></select>
         <button class="action-btn">+ Compare</button>
         <button class="action-btn" style="margin-left:auto">Create Canvas</button>
       </div>
@@ -1068,6 +1059,7 @@ async function loadFromSupabase() {
     // Re-render active page with live data
     renderFeedbackTable();
     renderOpportunities();
+    populateSizingSelect();
     showSupabaseBanner();
 
   } catch (err) {
@@ -1398,104 +1390,96 @@ const oppData = {
   }
 };
 
-const sizingData = {
-  checkout: {
-    metrics: [
-      {label:'Total mentions',value:'247',sub:'All sources · 30 days'},
-      {label:'Unique users',value:'~1,200',sub:'Est. from cases + survey'},
-      {label:'Mentions / day',value:'8.2',sub:'↑ 40% trend'},
-      {label:'Weeks trending',value:'1',sub:'Spiked this week'},
-      {label:'Priority score',value:'88',sub:'/ 100',color:'#E24B4A'}
-    ],
-    bars: [18,22,20,19,25,21,23,28,55,100],
-    segments: [{label:'Buyers',pct:82,color:'#378ADD'},{label:'Mobile users',pct:65,color:'#7F77DD'},{label:'New users',pct:41,color:'#1D9E75'},{label:'Sellers',pct:18,color:'#EF9F27'}],
-    sources: [{label:'Salesforce cases',val:142},{label:'CSAT responses',val:61},{label:'NPS verbatims',val:28},{label:'Slack mentions',val:16}]
-  },
-  search: {
-    metrics: [
-      {label:'Total mentions',value:'189',sub:'All sources · 30 days'},
-      {label:'Unique users',value:'~900',sub:'Est. from cases + survey'},
-      {label:'Mentions / day',value:'6.3',sub:'↑ 12% trend'},
-      {label:'Weeks trending',value:'3',sub:'Persistent theme'},
-      {label:'Priority score',value:'72',sub:'/ 100',color:'#EF9F27'}
-    ],
-    bars: [30,32,35,38,40,44,42,48,52,55],
-    segments: [{label:'Mobile buyers',pct:74,color:'#378ADD'},{label:'New users',pct:52,color:'#7F77DD'},{label:'Return buyers',pct:38,color:'#1D9E75'},{label:'Sellers',pct:9,color:'#EF9F27'}],
-    sources: [{label:'CSAT responses',val:89},{label:'Salesforce cases',val:67},{label:'NPS verbatims',val:33}]
-  },
-  fees: {
-    metrics: [
-      {label:'Total mentions',value:'164',sub:'All sources · 30 days'},
-      {label:'Unique users',value:'~600',sub:'Est. from NPS + cases'},
-      {label:'Mentions / day',value:'5.5',sub:'↑ 8% trend'},
-      {label:'Weeks trending',value:'2',sub:'Post pricing change'},
-      {label:'Priority score',value:'65',sub:'/ 100',color:'#EF9F27'}
-    ],
-    bars: [10,12,14,22,40,48,44,42,38,36],
-    segments: [{label:'Sellers',pct:88,color:'#378ADD'},{label:'Power sellers',pct:55,color:'#7F77DD'},{label:'New sellers',pct:31,color:'#1D9E75'},{label:'Buyers',pct:4,color:'#EF9F27'}],
-    sources: [{label:'NPS verbatims',val:82},{label:'Salesforce cases',val:55},{label:'Slack mentions',val:27}]
-  },
-  b2bPricing: {
-    metrics: [
-      {label:'Total mentions',value:'192',sub:'Property B2B CSAT · Q2 FY26'},
-      {label:'Unique respondents',value:'~200',sub:'Est. agency contacts'},
-      {label:'% of all B2B CSAT',value:'74%',sub:'192 of 260 responses'},
-      {label:'Weeks in dataset',value:'13',sub:'Q2 FY26 dataset'},
-      {label:'Priority score',value:'84',sub:'/ 100',color:'#E24B4A'}
-    ],
-    bars: [40,42,48,50,55,60,65,70,75,80],
-    segments: [{label:'RFS Agents',pct:92,color:'#378ADD'},{label:'Small independents',pct:55,color:'#7F77DD'},{label:'Pricing pkg buyers',pct:88,color:'#1D9E75'},{label:'Renewed annually',pct:76,color:'#EF9F27'}],
-    sources: [{label:'Property B2B CSAT',val:192},{label:'Pricing-related',val:192},{label:'Other B2B CSAT',val:60}]
-  },
-  propertyRedesign: {
-    metrics: [
-      {label:'Total mentions',value:'87',sub:'Property Frend · Mar 2026'},
-      {label:'Unique users',value:'~87',sub:'Direct feedback widget'},
-      {label:'Mentions / day',value:'2.9',sub:'↑ Recent redesign spike'},
-      {label:'Days since redesign',value:'~14',sub:'Launch trigger identified'},
-      {label:'Priority score',value:'76',sub:'/ 100',color:'#E24B4A'}
-    ],
-    bars: [0,0,0,5,10,18,22,28,35,40],
-    segments: [{label:'Property buyers',pct:100,color:'#378ADD'},{label:'Desktop users',pct:68,color:'#7F77DD'},{label:'Returning users',pct:74,color:'#1D9E75'},{label:'Mobile users',pct:32,color:'#EF9F27'}],
-    sources: [{label:'Property Frend widget',val:87}]
-  },
-  motorsListingEdit: {
-    metrics: [
-      {label:'Total mentions',value:'23',sub:'Motors Sell CSAT · Q1 2026'},
-      {label:'Unique users',value:'~23',sub:'Motors boat sellers'},
-      {label:'Primary issue',value:'End date bug',sub:'Most frequent complaint'},
-      {label:'Weeks trending',value:'8+',sub:'Q1 2026 sustained'},
-      {label:'Priority score',value:'54',sub:'/ 100',color:'#EF9F27'}
-    ],
-    bars: [3,2,3,4,3,2,3,3,2,3],
-    segments: [{label:'Motorboat sellers',pct:100,color:'#378ADD'},{label:'Existing listers',pct:80,color:'#7F77DD'},{label:'Relist requests',pct:55,color:'#1D9E75'},{label:'End date issues',pct:60,color:'#EF9F27'}],
-    sources: [{label:'Motors Sell CSAT',val:23}]
-  },
-  motorsPhotos: {
-    metrics: [
-      {label:'Total mentions',value:'15',sub:'Motors Sell CSAT · Q1 2026'},
-      {label:'Unique users',value:'~15',sub:'Motors boat sellers'},
-      {label:'Primary issue',value:'File size limits',sub:'5MB cap too restrictive'},
-      {label:'Weeks trending',value:'10+',sub:'Q1 2026 sustained'},
-      {label:'Priority score',value:'46',sub:'/ 100',color:'#EF9F27'}
-    ],
-    bars: [1,2,1,2,2,1,2,2,1,2],
-    segments: [{label:'Motorboat sellers',pct:100,color:'#378ADD'},{label:'Photo limit hit',pct:60,color:'#7F77DD'},{label:'File size issues',pct:40,color:'#1D9E75'},{label:'Upload errors',pct:35,color:'#EF9F27'}],
-    sources: [{label:'Motors Sell CSAT',val:15}]
-  },
-  motorsPricing: {
-    metrics: [
-      {label:'Total mentions',value:'11',sub:'Motors Sell CSAT · Q1 2026'},
-      {label:'Unique users',value:'~11',sub:'Motors boat sellers'},
-      {label:'Avg list cost cited',value:'$299',sub:'Boats classified'},
-      {label:'Weeks trending',value:'8+',sub:'Q1 2026 sustained'},
-      {label:'Priority score',value:'36',sub:'/ 100',color:'#378ADD'}
-    ],
-    bars: [1,1,1,1,2,1,1,1,1,2],
-    segments: [{label:'Motorboat sellers',pct:100,color:'#378ADD'},{label:'Price concern',pct:100,color:'#7F77DD'},{label:'One-off sellers',pct:80,color:'#1D9E75'},{label:'Unsold after 1 month',pct:60,color:'#EF9F27'}],
-    sources: [{label:'Motors Sell CSAT',val:11}]
+// ── Derive sizing data live from feedbackRows ─────────────────────────────────
+function deriveSizingData(key) {
+  const rows = (typeof sbClientReady !== 'undefined' && sbClientReady && liveFeedback) ? liveFeedback : feedbackRows;
+  const matched = rows.filter(r => r.oppKey === key);
+  const total = matched.length;
+
+  // Counts per source label
+  const srcCounts = {};
+  matched.forEach(r => {
+    const lbl = r.srcLabel || r.src || 'Unknown';
+    srcCounts[lbl] = (srcCounts[lbl] || 0) + 1;
+  });
+  const sources = Object.entries(srcCounts)
+    .sort((a,b) => b[1]-a[1])
+    .map(([label,val]) => ({label, val}));
+  const numSources = sources.length;
+
+  // Unique verticals
+  const verticals = [...new Set(matched.map(r => r.vertical).filter(Boolean))];
+
+  // Sentiment breakdown
+  const negCount = matched.filter(r => r.sent === 'neg').length;
+  const negPct = total ? Math.round((negCount/total)*100) : 0;
+
+  // Spread feedback across 10 pseudo-weeks based on data order (real date sorting not available for all rows)
+  const bars = Array(10).fill(0);
+  if (total > 0) {
+    matched.forEach((r, i) => {
+      const bucket = Math.min(9, Math.floor((i / total) * 10));
+      bars[bucket]++;
+    });
   }
-};
+
+  // Priority score: scaled by total mentions, source diversity, negativity
+  const rawScore = Math.min(100, Math.round(
+    (Math.log1p(total) / Math.log1p(300)) * 60 +
+    (numSources / 5) * 20 +
+    (negPct / 100) * 20
+  ));
+  const scoreColor = rawScore >= 75 ? '#E24B4A' : rawScore >= 50 ? '#EF9F27' : '#378ADD';
+
+  // Segment bar: top themes from matched rows
+  const themeCounts = {};
+  matched.forEach(r => (r.themes||[]).forEach(t => { themeCounts[t] = (themeCounts[t]||0)+1; }));
+  const segColors = ['#378ADD','#7F77DD','#1D9E75','#EF9F27'];
+  const segments = Object.entries(themeCounts)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0,4)
+    .map(([label,cnt],i) => ({
+      label,
+      pct: Math.round((cnt/total)*100),
+      color: segColors[i]
+    }));
+
+  const mentionsPerDay = total > 0 ? (total / 70).toFixed(1) : '0';
+
+  return {
+    metrics: [
+      {label:'Total mentions',  value: String(total),         sub:`${numSources} source${numSources!==1?'s':''}` },
+      {label:'Unique sources',  value: String(numSources),    sub: verticals.join(', ') || 'All verticals' },
+      {label:'Mentions / day',  value: mentionsPerDay,        sub:'Est. over 10 weeks' },
+      {label:'Negative sentiment', value: negPct+'%',         sub:`${negCount} of ${total} responses` },
+      {label:'Priority score',  value: String(rawScore),      sub:'/ 100', color: scoreColor }
+    ],
+    bars,
+    segments: segments.length ? segments : [{label:'No theme data',pct:0,color:'#ccc'}],
+    sources
+  };
+}
+
+// Populate sizing dropdown from oppData keys
+function populateSizingSelect() {
+  const sel = document.getElementById('sizingSelect');
+  if (!sel) return;
+  const rows = (typeof sbClientReady !== 'undefined' && sbClientReady && liveFeedback) ? liveFeedback : feedbackRows;
+
+  // Build list: all oppData keys, sorted by feedback count descending
+  const countByKey = {};
+  rows.forEach(r => { if(r.oppKey) countByKey[r.oppKey] = (countByKey[r.oppKey]||0)+1; });
+
+  const keys = Object.keys(oppData).sort((a,b) => (countByKey[b]||0)-(countByKey[a]||0));
+  const current = sel.value;
+  sel.innerHTML = keys.map(k => {
+    const cnt = countByKey[k] || 0;
+    const title = oppData[k]?.title || k;
+    return `<option value="${k}">${title}${cnt ? ' ('+cnt+')' : ''}</option>`;
+  }).join('');
+  // Restore selection if still valid
+  if (current && keys.includes(current)) sel.value = current;
+}
 
 const feedbackRows = [
   // ── Mock rows ──────────────────────────────────────────────────────────────
@@ -2082,9 +2066,9 @@ function renderOppDetail(key) {
   const d = oppData[key];
   const detail = document.getElementById('opp-detail');
   
-  // Generate a plausible trend for B2B opps
-  const isSizing = sizingData[key];
-  const trendBars = isSizing ? sizingData[key].bars : [2,3,2,4,3,5,4,6,5,7];
+  // Generate trend bars from real feedback data
+  const sizingD = deriveSizingData(key);
+  const trendBars = (sizingD && sizingD.bars && sizingD.bars.some(b=>b>0)) ? sizingD.bars : [2,3,2,4,3,5,4,6,5,7];
   const maxT = Math.max(...trendBars);
 
   const statusMeta = {
@@ -2369,6 +2353,7 @@ function renderDrawer(idx) {
 }
 
 renderFeedbackTable();
+populateSizingSelect();
 // Attempt to load live data from Supabase after page fully loads (ensures CDN is ready)
 window.addEventListener('load', () => {
   if (SUPABASE_URL && SUPABASE_ANON && !sbClient) {
@@ -2456,7 +2441,8 @@ function updateTrendChart() {
 // SIZING
 // ══════════════════════════════════
 function renderSizing(key) {
-  const d = sizingData[key];
+  if (!key) return;
+  const d = deriveSizingData(key);
   if (!d) return;
 
   const metricsEl = document.getElementById('sizingMetrics');
