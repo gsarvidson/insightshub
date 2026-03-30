@@ -334,6 +334,9 @@ td { padding: 9px 10px; vertical-align: top; }
 .view-name { font-size: 13px; color: var(--color-text-primary); flex: 1; }
 .view-meta { font-size: 11px; color: var(--color-text-tertiary); }
 .view-btn { font-size: 11px; padding: 2px 8px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); color: var(--color-text-secondary); cursor: pointer; background: var(--color-background-primary); }
+.vert-btn { font-size: 13px; padding: 7px 18px; border: 1.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); color: var(--color-text-secondary); cursor: pointer; background: var(--color-background-primary); transition: all 0.1s; }
+.vert-btn:hover { border-color: var(--tm-blurple); color: var(--tm-blurple); }
+.vert-btn.active { border-color: var(--tm-blurple); background: var(--tm-blurple); color: #fff; font-weight: 500; }
 
 /* ── Add Feedback page ── */
 .af-field { margin-bottom: 0.875rem; }
@@ -697,12 +700,15 @@ body { background: var(--color-background-tertiary) !important; font-family: var
     <div class="main">
       <div class="page-title">Settings</div>
       <div class="page-sub">Manage data connections and your preferences</div>
-      <div class="tabs">
-        <div class="tab active">Data sources</div>
-        <div class="tab">Alerts</div>
-        <div class="tab">Saved views</div>
-        <div class="tab">Preferences</div>
+      <div class="tabs" id="settingsTabs">
+        <div class="tab active" data-tab="tab-datasources">Data sources</div>
+        <div class="tab" data-tab="tab-alerts">Alerts</div>
+        <div class="tab" data-tab="tab-savedviews">Saved views</div>
+        <div class="tab" data-tab="tab-preferences">Preferences</div>
       </div>
+
+      <!-- Tab: Data sources -->
+      <div id="tab-datasources" class="tab-panel">
       <div class="section-label-sm">Connected sources</div>
       <div class="source-card">
         <div class="src-icon" style="background:#FCEBEB;color:#A32D2D">SF</div>
@@ -801,6 +807,38 @@ body { background: var(--color-background-tertiary) !important; font-family: var
         <div class="view-row"><span class="view-name">Payment & checkout topics</span><span class="view-meta">Feedback · Payments theme · All time</span><button class="view-btn">Load</button><button class="view-btn">Edit</button></div>
         <div class="view-row"><span class="view-name">Urgent opportunity watch</span><span class="view-meta">Opportunities · Urgent · Score > 70</span><button class="view-btn">Load</button><button class="view-btn">Edit</button></div>
       </div>
+      </div><!-- end tab-datasources -->
+
+      <!-- Tab: Alerts -->
+      <div id="tab-alerts" class="tab-panel" style="display:none">
+        <div class="section-label-sm">Alert rules</div>
+        <p style="font-size:13px;color:var(--color-text-secondary)">Alert configuration coming soon.</p>
+      </div>
+
+      <!-- Tab: Saved views -->
+      <div id="tab-savedviews" class="tab-panel" style="display:none">
+        <div class="section-label-sm">Saved views</div>
+        <div class="saved-views">
+          <div class="view-row"><span class="view-name">My weekly seller issues</span><span class="view-meta">Feedback · Seller · Last 7 days</span><button class="view-btn">Load</button><button class="view-btn">Edit</button></div>
+          <div class="view-row"><span class="view-name">Payment & checkout topics</span><span class="view-meta">Feedback · Payments theme · All time</span><button class="view-btn">Load</button><button class="view-btn">Edit</button></div>
+          <div class="view-row"><span class="view-name">Urgent opportunity watch</span><span class="view-meta">Opportunities · Urgent · Score > 70</span><button class="view-btn">Load</button><button class="view-btn">Edit</button></div>
+        </div>
+      </div>
+
+      <!-- Tab: Preferences -->
+      <div id="tab-preferences" class="tab-panel" style="display:none">
+        <div class="section-label-sm">Default vertical</div>
+        <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem">Filter all views — Dashboard, Feedback, and Opportunities — to a specific vertical by default. You can always change filters inline on each page.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap" id="verticalPicker">
+          <button class="vert-btn active" data-vert="">All verticals</button>
+          <button class="vert-btn" data-vert="Property">Property</button>
+          <button class="vert-btn" data-vert="Motors">Motors</button>
+          <button class="vert-btn" data-vert="General">General</button>
+          <button class="vert-btn" data-vert="Jobs">Jobs</button>
+        </div>
+        <div id="vertPrefConfirm" style="margin-top:12px;font-size:12px;color:var(--color-text-success);display:none">✓ Default vertical saved for this session.</div>
+      </div>
+
     </div>
   </div>
 
@@ -2016,13 +2054,16 @@ function navigate(pageId) {
   if (page) page.classList.add('active');
   document.querySelectorAll('.nav-item[data-page="' + pageId + '"]').forEach(n => n.classList.add('active'));
   if (pageId === 'feedback') {
-    setTimeout(initFeedbackChart, 50);
+    setTimeout(() => { initFeedbackChart(); applyDefaultVertical(); }, 50);
   }
   if (pageId === 'sizing') {
     setTimeout(() => renderSizing(document.getElementById('sizingSelect').value), 50);
   }
   if (pageId === 'dashboard') {
     setTimeout(initDashboardCharts, 50);
+  }
+  if (pageId === 'opportunities') {
+    setTimeout(applyDefaultVertical, 50);
   }
   // Update URL hash without adding a browser history entry
   history.replaceState(null, '', '#' + pageId);
@@ -2848,14 +2889,17 @@ document.querySelectorAll('.export-btn[data-goto]').forEach(btn => {
 // ══════════════════════════════════
 let dashVolumeChartInst = null, dashSourceChartInst = null;
 function initDashboardCharts() {
-  const rows = (typeof sbClientReady !== 'undefined' && sbClientReady && liveFeedback) ? liveFeedback : feedbackRows;
+  const allRows = (typeof sbClientReady !== 'undefined' && sbClientReady && liveFeedback) ? liveFeedback : feedbackRows;
+  const rows = (typeof defaultVertical !== 'undefined' && defaultVertical)
+    ? allRows.filter(r => (r.vertical||'').toLowerCase() === defaultVertical.toLowerCase())
+    : allRows;
 
   // ── Metrics ──────────────────────────────────────────────────
   const total = rows.length;
   document.getElementById('dash-total-feedback').textContent = total.toLocaleString();
   document.getElementById('dash-total-delta').className = 'metric-delta delta-up';
   document.getElementById('dash-total-delta').textContent = `From ${[...new Set(rows.map(r=>r.srcLabel).filter(Boolean))].length} sources`;
-  document.getElementById('dashPageSub').textContent = `All time · All sources · ${total.toLocaleString()} items`;
+  document.getElementById('dashPageSub').textContent = `${defaultVertical || 'All verticals'} · All sources · ${total.toLocaleString()} items`;
 
   // Open opps = count unique oppKey values with a non-Done status
   const oppKeys = [...new Set(rows.map(r=>r.oppKey).filter(Boolean))];
@@ -3016,6 +3060,9 @@ function initDashboardCharts() {
   });
 }
 
+// ── Default vertical (session preference) ────────────────────
+let defaultVertical = sessionStorage.getItem('ih_default_vertical') || '';
+
 // Init on first load
 initDashboardCharts();
 
@@ -3136,10 +3183,65 @@ document.querySelector('.clear-btn')?.addEventListener('click', () => {
 
 // Populate filters from data on load
 populateFeedbackFilters();
-document.querySelectorAll('.tab').forEach(tab => {
+// ── Settings tab switching ────────────────────────────────────
+document.querySelectorAll('#settingsTabs .tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('#settingsTabs .tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+    const panel = document.getElementById(target);
+    if (panel) panel.style.display = '';
+  });
+});
+
+// ── Default vertical preference ───────────────────────────────
+function applyDefaultVertical() {
+  // Feedback page vertical filter
+  const vertSel = document.getElementById('fb-filter-vertical');
+  if (vertSel && defaultVertical !== vertSel.value) {
+    vertSel.value = defaultVertical;
+    applyFeedbackFilters();
+  }
+  // Opportunities page: filter cards by vertical via data
+  applyOppVerticalFilter();
+  // Dashboard: re-init with filtered rows
+  if (document.getElementById('page-dashboard')?.classList.contains('active')) {
+    initDashboardCharts();
+  }
+}
+
+function applyOppVerticalFilter() {
+  const cards = document.querySelectorAll('.opp-card[data-opp]');
+  cards.forEach(card => {
+    if (!defaultVertical) { card.style.display = ''; return; }
+    const key = card.dataset.opp;
+    const d = oppData[key];
+    if (!d) { card.style.display = ''; return; }
+    // Check if any feedback row for this oppKey matches the vertical
+    const rows = (typeof sbClientReady !== 'undefined' && sbClientReady && liveFeedback) ? liveFeedback : feedbackRows;
+    const match = rows.some(r => r.oppKey === key && (r.vertical||'').toLowerCase() === defaultVertical.toLowerCase());
+    card.style.display = match ? '' : 'none';
+  });
+}
+
+// Restore saved vertical on picker buttons
+(function restoreVertPicker() {
+  document.querySelectorAll('#verticalPicker .vert-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.vert === defaultVertical);
+  });
+})();
+
+document.querySelectorAll('#verticalPicker .vert-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    defaultVertical = btn.dataset.vert;
+    sessionStorage.setItem('ih_default_vertical', defaultVertical);
+    document.querySelectorAll('#verticalPicker .vert-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Show confirm message briefly
+    const confirm = document.getElementById('vertPrefConfirm');
+    if (confirm) { confirm.style.display = 'block'; setTimeout(() => confirm.style.display = 'none', 2500); }
+    applyDefaultVertical();
   });
 });
 
