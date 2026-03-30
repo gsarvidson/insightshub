@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Insights Hub — Trade Me</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
 
@@ -375,6 +376,12 @@ body { background: var(--color-background-tertiary) !important; font-family: var
 </style>
 </head>
 <body>
+<!-- Supabase live data banner (hidden until connected) -->
+<div id="supabase-banner" style="display:none;align-items:center;gap:8px;background:#E8F5E9;border-bottom:1px solid #C8E6C9;padding:6px 16px;font-size:12px;color:#2E7D32;font-family:'Barlow Condensed',sans-serif">
+  <span style="width:8px;height:8px;border-radius:50%;background:#43A047;display:inline-block;flex-shrink:0"></span>
+  <strong>Live data</strong> · Connected to Supabase · Feedback and opportunity status changes are persisted
+  <button onclick="document.getElementById('supabase-banner').style.display='none'" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#666;font-size:14px">×</button>
+</div>
 <div class="shell">
 
   <!-- ═══ NAV ═══ -->
@@ -971,6 +978,135 @@ body { background: var(--color-background-tertiary) !important; font-family: var
 </div><!-- end shell -->
 
 <script>
+// ══════════════════════════════════════════════════════════════
+// SUPABASE CONFIG
+// Replace these values with your own from supabase.com/dashboard
+// Project Settings → API → URL + anon key
+// ══════════════════════════════════════════════════════════════
+const SUPABASE_URL  = 'https://goxuzkkgytbhkvwycttl.supabase.co';   // e.g. 'https://xxxx.supabase.co'
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdveHV6a2tneXRiaGt2d3ljdHRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NTI4NDYsImV4cCI6MjA5MDQyODg0Nn0.md6mGVjchdjEeh_9iTJcXjEA6PvnGEpeFUsK5WZuYmA';   // e.g. 'eyJhbGci...'
+
+let supabase = null;
+if (SUPABASE_URL && SUPABASE_ANON) {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+}
+
+// ── Live data holders (populated from Supabase when configured) ───────────────
+let liveFeedback = null;       // replaces feedbackRows when loaded
+let liveOpps = null;           // replaces oppData when loaded
+let supabaseReady = false;
+
+async function loadFromSupabase() {
+  if (!supabase) return;
+  try {
+    const [fbResult, oppResult, oppSrcResult] = await Promise.all([
+      supabase.from('feedback').select('*').order('date_actual', { ascending: false }),
+      supabase.from('opportunities').select('*').order('mentions', { ascending: false }),
+      supabase.from('opportunity_sources').select('*'),
+    ]);
+
+    if (fbResult.error || oppResult.error) throw (fbResult.error || oppResult.error);
+
+    // Map Supabase feedback rows → prototype format
+    liveFeedback = fbResult.data.map(r => ({
+      text: r.text,
+      meta: r.meta,
+      src: r.src,
+      srcLabel: r.src_label,
+      vertical: r.vertical,
+      date: r.date_label || new Date(r.date_actual).toLocaleDateString('en-NZ'),
+      sent: r.sentiment,
+      themes: r.themes || [],
+      opp: r.opp,
+      oppKey: r.opp_key,
+      drawer: {
+        caseId: r.case_id,
+        date: r.date_label,
+        sentiment: r.sentiment === 'neg' ? 'Negative' : r.sentiment === 'pos' ? 'Positive' : 'Neutral',
+        sentColor: r.sentiment === 'neg' ? '#A32D2D' : r.sentiment === 'pos' ? '#1D9E75' : '#666',
+        userType: r.user_type,
+        platform: r.platform,
+        verbatim: r.verbatim || r.text,
+        tags: r.tags || [],
+        oppLink: r.opp_link,
+        aiNote: r.ai_note,
+      }
+    }));
+
+    // Map Supabase opportunity rows → prototype oppData format
+    const srcsByKey = {};
+    (oppSrcResult.data || []).forEach(s => {
+      if (!srcsByKey[s.opp_key]) srcsByKey[s.opp_key] = [];
+      srcsByKey[s.opp_key].push({ name: s.source_name, count: s.count });
+    });
+
+    liveOpps = {};
+    oppResult.data.forEach(o => {
+      liveOpps[o.opp_key] = {
+        title: o.title,
+        sub: o.subtitle,
+        status: o.status,
+        stats: [
+          { label: 'Mentions', val: String(o.mentions) },
+          { label: 'Trend', val: o.trend || '—', color: o.trend_color },
+          { label: 'Sources', val: String(o.sources_count) },
+          { label: 'Affected users', val: o.affected_users || '—' },
+        ],
+        sources: srcsByKey[o.opp_key] || [],
+        tags: o.tags || [],
+        feedback: [],
+      };
+    });
+
+    supabaseReady = true;
+    console.log(`✅ Supabase loaded: ${liveFeedback.length} feedback rows, ${oppResult.data.length} opportunities`);
+
+    // Re-render active page with live data
+    renderFeedbackTable();
+    renderOpportunities();
+    showSupabaseBanner();
+
+  } catch (err) {
+    console.warn('Supabase load failed, using hardcoded data:', err.message);
+  }
+}
+
+function showSupabaseBanner() {
+  const banner = document.getElementById('supabase-banner');
+  if (banner) banner.style.display = 'flex';
+}
+
+// Sync an opportunity status update back to Supabase
+async function syncStatusToSupabase(oppKey, newStatus) {
+  if (!supabase) return;
+  const { error } = await supabase
+    .from('opportunities')
+    .update({ status: newStatus, updated_at: new Date().toISOString() })
+    .eq('opp_key', oppKey);
+  if (error) console.warn('Status sync failed:', error.message);
+}
+
+// Save a manually added feedback row to Supabase
+async function saveFeedbackToSupabase(row) {
+  if (!supabase) return;
+  const { error } = await supabase.from('feedback').insert([{
+    text: row.text,
+    meta: row.meta,
+    src: row.src,
+    src_label: row.srcLabel,
+    vertical: row.vertical,
+    date_label: row.date,
+    date_actual: new Date().toISOString(),
+    sentiment: row.sent,
+    themes: row.themes,
+    opp: row.opp,
+    opp_key: row.oppKey,
+    verbatim: row.text,
+    tags: row.themes,
+  }]);
+  if (error) console.warn('Feedback save failed:', error.message);
+}
+
 // ══════════════════════════════════
 // DATA
 // ══════════════════════════════════
@@ -2024,6 +2160,7 @@ function renderOppDetail(key) {
       e.stopPropagation();
       const newStatus = item.dataset.status;
       oppStatuses[key] = newStatus;
+      syncStatusToSupabase(key, newStatus);  // ← sync to Supabase
       dropdown.classList.remove('open');
 
       // Update detail pill
@@ -2112,7 +2249,8 @@ let activeDrawerRow = null;
 
 function renderFeedbackTable() {
   const tbody = document.getElementById('feedbackTableBody');
-  tbody.innerHTML = feedbackRows.map((row, i) => `
+  const rows = (supabaseReady && liveFeedback) ? liveFeedback : feedbackRows;
+  tbody.innerHTML = rows.map((row, i) => `
     <tr data-idx="${i}">
       <td><div class="cell-text">${row.text}</div><div class="cell-meta">${row.meta}</div></td>
       <td><span class="source-badge src-${row.src}">${row.srcLabel}</span></td>
@@ -2145,7 +2283,8 @@ function renderFeedbackTable() {
 }
 
 function renderDrawer(idx) {
-  const row = feedbackRows[idx];
+  const rows = (supabaseReady && liveFeedback) ? liveFeedback : feedbackRows;
+  const row = rows[idx];
   const d = row.drawer;
   const drawer = document.getElementById('feedbackDrawer');
   const overlay = document.getElementById('feedbackDrawerOverlay');
@@ -2222,6 +2361,8 @@ function renderDrawer(idx) {
 }
 
 renderFeedbackTable();
+// Attempt to load live data from Supabase (no-op if credentials not set)
+loadFromSupabase();
 // Hide drawer on initial load - open only when a row is clicked
 document.getElementById('feedbackDrawer').classList.add('hidden');
 document.getElementById('feedbackLayout').classList.add('no-drawer');
@@ -2849,6 +2990,16 @@ document.getElementById('af-submit').addEventListener('click', () => {
     document.getElementById('af-source').style.borderColor = source ? '' : 'var(--tm-pink)';
     return;
   }
+  // Build row
+  const newRow = {
+    text, src: source, srcLabel: source, meta: document.getElementById('af-customer').value || 'Manual entry',
+    vertical: document.getElementById('af-ctype').value || 'General',
+    date: new Date().toLocaleDateString('en-NZ'), sent: selectedSentiment || 'neu',
+    themes: (document.getElementById('af-tags').value || '').split(',').map(t=>t.trim()).filter(Boolean),
+    opp: document.getElementById('af-opp').value || '', oppKey: '',
+  };
+  // Save to Supabase (fire and forget)
+  saveFeedbackToSupabase(newRow);
   // Show success
   document.getElementById('af-text').style.borderColor = '';
   document.getElementById('af-source').style.borderColor = '';
