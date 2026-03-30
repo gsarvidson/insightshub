@@ -2017,7 +2017,16 @@ function navigate(pageId) {
   if (pageId === 'dashboard') {
     setTimeout(initDashboardCharts, 50);
   }
+  // Update URL hash without adding a browser history entry
+  history.replaceState(null, '', '#' + pageId);
 }
+
+// Navigate to hash on load (e.g. after page refresh)
+(function() {
+  const hash = window.location.hash.replace('#', '');
+  const validPages = ['dashboard','opportunities','feedback','ai-assistant','sizing','add-feedback','sources'];
+  if (hash && validPages.includes(hash)) navigate(hash);
+})();
 
 document.querySelectorAll('.nav-item[data-page]').forEach(item => {
   item.addEventListener('click', () => navigate(item.dataset.page));
