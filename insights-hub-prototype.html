@@ -586,11 +586,11 @@ body { background: var(--color-background-tertiary) !important; font-family: var
         </div>
         <div class="filter-bar">
           <span class="filter-label">Filters</span>
-          <select class="filter-select"><option>All sources</option><option>Salesforce</option><option>CSAT</option><option>NPS</option><option>Slack</option><option>Property Frend</option><option>Motors Sell</option><option>Property B2B CSAT</option><option>Slack B2B</option></select>
-          <select class="filter-select"><option>All verticals</option><option>Property</option><option>Motors</option><option>General</option><option>Jobs</option></select>
-          <select class="filter-select"><option>All themes</option><option>Payments</option><option>Search</option><option>Fees</option><option>Photos</option></select>
-          <select class="filter-select"><option>All sentiment</option><option>Negative</option><option>Neutral</option><option>Positive</option></select>
-          <select class="filter-select"><option>Last 10 weeks</option><option>Last 30 days</option><option>Last 7 days</option></select>
+          <select id="fb-filter-source" class="filter-select"><option value="">All sources</option></select>
+          <select id="fb-filter-vertical" class="filter-select"><option value="">All verticals</option></select>
+          <select id="fb-filter-theme" class="filter-select"><option value="">All themes</option></select>
+          <select id="fb-filter-sentiment" class="filter-select"><option value="">All sentiment</option></select>
+          <select id="fb-filter-date" class="filter-select"><option value="">All time</option><option value="10w">Last 10 weeks</option><option value="30d">Last 30 days</option><option value="7d">Last 7 days</option></select>
           <input class="search-input" type="text" placeholder="Search keywords…" />
           <span class="saved-chip">Saved view ▾</span>
           <span class="clear-btn">Clear all</span>
@@ -2284,6 +2284,10 @@ function renderFeedbackTable() {
       renderDrawer(parseInt(tr.dataset.idx));
     });
   });
+
+  // Refresh filter dropdowns from new data and re-apply any active filters
+  if (typeof populateFeedbackFilters === 'function') populateFeedbackFilters();
+  if (typeof applyFeedbackFilters   === 'function') applyFeedbackFilters();
 }
 
 function renderDrawer(idx) {
@@ -2916,56 +2920,120 @@ initDashboardCharts();
 // ══════════════════════════════════
 // FEEDBACK FILTER INTERACTIONS
 // ══════════════════════════════════
-(function() {
-  const allRows = Array.from(document.querySelectorAll('#feedbackTableBody tr'));
 
-  function applyFilters() {
-    const sourceVal = document.querySelector('.filter-select:nth-of-type(1)')?.value || 'All sources';
-    const themeVal = document.querySelector('.filter-select:nth-of-type(2)')?.value || 'All themes';
-    const sentVal = document.querySelector('.filter-select:nth-of-type(3)')?.value || 'All sentiment';
-    const searchVal = (document.querySelector('.search-input')?.value || '').toLowerCase();
+function populateFeedbackFilters() {
+  const rows = (typeof sbClientReady !== 'undefined' && sbClientReady && liveFeedback) ? liveFeedback : feedbackRows;
 
-    let visible = 0;
-    allRows.forEach(row => {
-      const srcCell = row.querySelector('.source-badge');
-      const themeCell = row.querySelector('td:nth-child(5)');
-      const sentCell = row.querySelector('.sentiment');
-      const textCell = row.querySelector('.cell-text');
+  // Collect unique values from data
+  const sources   = [...new Set(rows.map(r => r.srcLabel).filter(Boolean))].sort();
+  const verticals = [...new Set(rows.map(r => r.vertical).filter(Boolean))].sort();
+  const themes    = [...new Set(rows.flatMap(r => r.themes || []).filter(Boolean))].sort();
+  const sentMap   = { neg: 'Negative', pos: 'Positive', neu: 'Neutral', neutral: 'Neutral' };
+  const sentiments = [...new Set(rows.map(r => sentMap[r.sent] || r.sent).filter(Boolean))].sort();
 
-      let show = true;
-      if (sourceVal !== 'All sources' && srcCell && !srcCell.textContent.toLowerCase().includes(sourceVal.toLowerCase())) show = false;
-      if (themeVal !== 'All themes' && themeCell && !themeCell.textContent.toLowerCase().includes(themeVal.toLowerCase())) show = false;
-      if (sentVal !== 'All sentiment' && sentCell && !sentCell.textContent.toLowerCase().includes(sentVal.toLowerCase())) show = false;
-      if (searchVal && textCell && !textCell.textContent.toLowerCase().includes(searchVal)) show = false;
-
-      row.style.display = show ? '' : 'none';
-      if (show) visible++;
+  function populate(id, values) {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const first = sel.options[0]; // keep "All …" option
+    sel.innerHTML = '';
+    sel.appendChild(first);
+    values.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v;
+      sel.appendChild(opt);
     });
-
-    // Update active filter chips
-    const activeRow = document.querySelector('.active-filters-row');
-    if (activeRow) {
-      const chips = [];
-      if (sourceVal !== 'All sources') chips.push(`<span class="active-filter">Source: ${sourceVal} <span onclick="this.closest('.active-filter').remove()" style="cursor:pointer;margin-left:2px">×</span></span>`);
-      if (themeVal !== 'All themes') chips.push(`<span class="active-filter">Theme: ${themeVal} <span onclick="this.closest('.active-filter').remove()" style="cursor:pointer;margin-left:2px">×</span></span>`);
-      if (sentVal !== 'All sentiment') chips.push(`<span class="active-filter">Sentiment: ${sentVal} <span onclick="this.closest('.active-filter').remove()" style="cursor:pointer;margin-left:2px">×</span></span>`);
-      activeRow.innerHTML = chips.length ? `<span style="font-size:12px;color:var(--color-text-secondary)">Active filters:</span>${chips.join('')}` : '';
-
-      // Update count
-      const countEl = document.querySelector('#page-feedback .page-sub');
-      if (countEl) countEl.textContent = `${visible} items · last 10 weeks · filtered`;
-    }
   }
 
-  document.querySelectorAll('.filter-select').forEach(sel => sel.addEventListener('change', applyFilters));
-  document.querySelector('.search-input')?.addEventListener('input', applyFilters);
-  document.querySelector('.clear-btn')?.addEventListener('click', () => {
-    document.querySelectorAll('.filter-select').forEach(sel => sel.selectedIndex = 0);
-    const si = document.querySelector('.search-input');
-    if (si) si.value = '';
-    applyFilters();
+  populate('fb-filter-source',    sources);
+  populate('fb-filter-vertical',  verticals);
+  populate('fb-filter-theme',     themes);
+  populate('fb-filter-sentiment', sentiments);
+}
+
+function applyFeedbackFilters() {
+  const sourceVal   = (document.getElementById('fb-filter-source')?.value   || '').toLowerCase();
+  const verticalVal = (document.getElementById('fb-filter-vertical')?.value  || '').toLowerCase();
+  const themeVal    = (document.getElementById('fb-filter-theme')?.value     || '').toLowerCase();
+  const sentVal     = (document.getElementById('fb-filter-sentiment')?.value || '').toLowerCase();
+  const dateVal     = document.getElementById('fb-filter-date')?.value || '';
+  const searchVal   = (document.querySelector('.search-input')?.value || '').toLowerCase();
+
+  const now = new Date();
+  function cutoffDate() {
+    if (dateVal === '7d')  { const d = new Date(now); d.setDate(d.getDate() - 7);   return d; }
+    if (dateVal === '30d') { const d = new Date(now); d.setDate(d.getDate() - 30);  return d; }
+    if (dateVal === '10w') { const d = new Date(now); d.setDate(d.getDate() - 70);  return d; }
+    return null;
+  }
+  const cutoff = cutoffDate();
+
+  const allRows = Array.from(document.querySelectorAll('#feedbackTableBody tr'));
+  let visible = 0;
+
+  allRows.forEach(tr => {
+    const srcText  = (tr.querySelector('.source-badge')?.textContent || '').toLowerCase();
+    const vertText = (tr.querySelector('td:nth-child(3)')?.textContent || '').toLowerCase();
+    const sentText = (tr.querySelector('.sentiment')?.textContent || '').toLowerCase();
+    const themeText= (tr.querySelector('td:nth-child(6)')?.textContent || '').toLowerCase();
+    const bodyText = (tr.querySelector('.cell-text')?.textContent || '').toLowerCase();
+    const metaText = (tr.querySelector('.cell-meta')?.textContent || '').toLowerCase();
+    const dateText = (tr.querySelector('td:nth-child(4)')?.textContent || '').trim();
+
+    let show = true;
+    if (sourceVal   && !srcText.includes(sourceVal))   show = false;
+    if (verticalVal && !vertText.includes(verticalVal)) show = false;
+    if (themeVal    && !themeText.includes(themeVal))   show = false;
+    if (sentVal     && !sentText.includes(sentVal))     show = false;
+    if (searchVal   && !bodyText.includes(searchVal) && !metaText.includes(searchVal)) show = false;
+    if (cutoff) {
+      const d = new Date(dateText);
+      if (!isNaN(d) && d < cutoff) show = false;
+    }
+
+    tr.style.display = show ? '' : 'none';
+    if (show) visible++;
   });
-})();
+
+  // Active filter chips
+  const activeRow = document.querySelector('.active-filters-row');
+  if (activeRow) {
+    const chips = [];
+    const srcSel  = document.getElementById('fb-filter-source');
+    const vertSel = document.getElementById('fb-filter-vertical');
+    const thmSel  = document.getElementById('fb-filter-theme');
+    const sentSel = document.getElementById('fb-filter-sentiment');
+    const dateSel = document.getElementById('fb-filter-date');
+    if (srcSel?.value)  chips.push(`<span class="active-filter">Source: ${srcSel.value} <span onclick="document.getElementById('fb-filter-source').value='';applyFeedbackFilters()" style="cursor:pointer;margin-left:2px">×</span></span>`);
+    if (vertSel?.value) chips.push(`<span class="active-filter">Vertical: ${vertSel.value} <span onclick="document.getElementById('fb-filter-vertical').value='';applyFeedbackFilters()" style="cursor:pointer;margin-left:2px">×</span></span>`);
+    if (thmSel?.value)  chips.push(`<span class="active-filter">Theme: ${thmSel.value} <span onclick="document.getElementById('fb-filter-theme').value='';applyFeedbackFilters()" style="cursor:pointer;margin-left:2px">×</span></span>`);
+    if (sentSel?.value) chips.push(`<span class="active-filter">Sentiment: ${sentSel.value} <span onclick="document.getElementById('fb-filter-sentiment').value='';applyFeedbackFilters()" style="cursor:pointer;margin-left:2px">×</span></span>`);
+    if (dateSel?.value) chips.push(`<span class="active-filter">Period: ${dateSel.options[dateSel.selectedIndex].text} <span onclick="document.getElementById('fb-filter-date').value='';applyFeedbackFilters()" style="cursor:pointer;margin-left:2px">×</span></span>`);
+    activeRow.innerHTML = chips.length
+      ? `<span style="font-size:12px;color:var(--color-text-secondary)">Active filters:</span>${chips.join('')}`
+      : '';
+    const countEl = document.querySelector('#page-feedback .page-sub');
+    if (countEl) countEl.textContent = `${visible} items${chips.length ? ' · filtered' : ''}`;
+  }
+}
+
+// Wire up filter controls
+['fb-filter-source','fb-filter-vertical','fb-filter-theme','fb-filter-sentiment','fb-filter-date'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', applyFeedbackFilters);
+});
+document.querySelector('.search-input')?.addEventListener('input', applyFeedbackFilters);
+document.querySelector('.clear-btn')?.addEventListener('click', () => {
+  ['fb-filter-source','fb-filter-vertical','fb-filter-theme','fb-filter-sentiment','fb-filter-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const si = document.querySelector('.search-input');
+  if (si) si.value = '';
+  applyFeedbackFilters();
+});
+
+// Populate filters from data on load
+populateFeedbackFilters();
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
