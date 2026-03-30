@@ -411,12 +411,12 @@ body { background: var(--color-background-tertiary) !important; font-family: var
   <div class="page active" id="page-dashboard">
     <div class="main">
       <div class="page-title">Dashboard</div>
-      <div class="page-sub">Last 30 days · All sources</div>
+      <div class="page-sub" id="dashPageSub">Last 30 days · All sources</div>
       <div class="metrics metrics-4">
-        <div class="metric"><div class="metric-label">Total feedback</div><div class="metric-value">2,847</div><div class="metric-delta delta-up">↑ 14% vs last month</div></div>
-        <div class="metric"><div class="metric-label">Open opportunities</div><div class="metric-value">46</div><div class="metric-delta delta-up">↑ 6 new from 3 sources</div></div>
-        <div class="metric"><div class="metric-label">Trending themes</div><div class="metric-value">8</div><div class="metric-delta delta-up">↑ 3 since yesterday</div></div>
-        <div class="metric"><div class="metric-label">Avg sentiment</div><div class="metric-value">62%</div><div class="metric-delta delta-down">↓ 4% vs last month</div></div>
+        <div class="metric"><div class="metric-label">Total feedback</div><div class="metric-value" id="dash-total-feedback">—</div><div class="metric-delta" id="dash-total-delta">Loading…</div></div>
+        <div class="metric"><div class="metric-label">Open opportunities</div><div class="metric-value" id="dash-open-opps">—</div><div class="metric-delta delta-up" id="dash-opps-delta">—</div></div>
+        <div class="metric"><div class="metric-label">Trending themes</div><div class="metric-value" id="dash-themes">—</div><div class="metric-delta delta-up" id="dash-themes-delta">—</div></div>
+        <div class="metric"><div class="metric-label">Avg sentiment</div><div class="metric-value" id="dash-sentiment">—</div><div class="metric-delta" id="dash-sentiment-delta">—</div></div>
       </div>
       <div class="ai-box">
         <div class="ai-label">AI summary</div>
@@ -426,18 +426,10 @@ body { background: var(--color-background-tertiary) !important; font-family: var
         <div>
           <div class="card">
             <div class="card-title">Top trending themes</div>
-            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Checkout payment failures</span><span class="trend-chip">↑ spike</span><div class="spark-bar-wrap" style="margin-left:8px"><div class="spark-bar" style="width:88%;background:#E24B4A"></div></div><span class="spark-count">247</span></div>
-            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Search relevance mobile</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:72%;background:#EF9F27"></div></div><span class="spark-count">189</span></div>
-            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Seller fee confusion</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:65%;background:#EF9F27"></div></div><span class="spark-count">164</span></div>
-            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Photo upload errors</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:48%;background:#378ADD"></div></div><span class="spark-count">121</span></div>
-            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Watch list notifications</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:38%;background:#378ADD"></div></div><span class="spark-count">97</span></div>
-            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Buyer messaging UX</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:29%;background:#1D9E75"></div></div><span class="spark-count">74</span></div>
-            <div class="spark-row" data-goto="opportunities"><span class="spark-label">⚑ Legal: "unless sold prior" wording</span><span class="trend-chip" style="background:#FCEBEB;color:#A32D2D">Urgent</span><div class="spark-bar-wrap" style="margin-left:8px"><div class="spark-bar" style="width:90%;background:#E24B4A"></div></div><span class="spark-count">3</span></div>
-            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Watchlist Connect reporting (B2B)</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:72%;background:#EF9F27"></div></div><span class="spark-count">18</span></div>
-            <div class="spark-row" data-goto="opportunities"><span class="spark-label">Reporting automation (B2B)</span><div class="spark-bar-wrap"><div class="spark-bar" style="width:60%;background:#EF9F27"></div></div><span class="spark-count">15</span></div>
+            <div id="dashSparkRows"><!-- populated by JS --></div>
           </div>
           <div class="card">
-            <div class="card-title">Feedback volume — last 7 days</div>
+            <div class="card-title">Feedback volume — last 10 weeks</div>
             <div style="position:relative;height:110px;margin-bottom:4px">
               <canvas id="dashVolumeChart"></canvas>
             </div>
@@ -455,13 +447,7 @@ body { background: var(--color-background-tertiary) !important; font-family: var
             <div style="position:relative;height:120px;margin-bottom:10px">
               <canvas id="dashSourceChart"></canvas>
             </div>
-            <div class="source-row"><div class="source-dot" style="background:#E24B4A"></div><span class="source-name">Salesforce cases</span><span class="source-count">1,204</span><span class="source-pct">34%</span></div>
-            <div class="source-row"><div class="source-dot" style="background:#378ADD"></div><span class="source-name">CSAT surveys</span><span class="source-count">847</span><span class="source-pct">24%</span></div>
-            <div class="source-row"><div class="source-dot" style="background:#EF9F27"></div><span class="source-name">NPS responses</span><span class="source-count">512</span><span class="source-pct">14%</span></div>
-            <div class="source-row"><div class="source-dot" style="background:#1D9E75"></div><span class="source-name">Slack feedback</span><span class="source-count">284</span><span class="source-pct">8%</span></div>
-            <div class="source-row"><div class="source-dot" style="background:#4854D3"></div><span class="source-name">Property B2B CSAT</span><span class="source-count">260</span><span class="source-pct">7%</span></div>
-            <div class="source-row"><div class="source-dot" style="background:#7F77DD"></div><span class="source-name">Property Frend</span><span class="source-count">100</span><span class="source-pct">3%</span></div>
-            <div class="source-row"><div class="source-dot" style="background:#FFEB33;outline:1px solid #bbb"></div><span class="source-name">Motors Sell CSAT</span><span class="source-count">53</span><span class="source-pct">1%</span></div>
+            <div id="dashSourceList"><!-- populated by JS --></div>
           </div>
         </div>
       </div>
@@ -2840,18 +2826,126 @@ document.querySelectorAll('.export-btn[data-goto]').forEach(btn => {
 // ══════════════════════════════════
 let dashVolumeChartInst = null, dashSourceChartInst = null;
 function initDashboardCharts() {
-  // Volume bar chart
+  const rows = (typeof sbClientReady !== 'undefined' && sbClientReady && liveFeedback) ? liveFeedback : feedbackRows;
+
+  // ── Metrics ──────────────────────────────────────────────────
+  const total = rows.length;
+  document.getElementById('dash-total-feedback').textContent = total.toLocaleString();
+  document.getElementById('dash-total-delta').className = 'metric-delta delta-up';
+  document.getElementById('dash-total-delta').textContent = `From ${[...new Set(rows.map(r=>r.srcLabel).filter(Boolean))].length} sources`;
+  document.getElementById('dashPageSub').textContent = `All time · All sources · ${total.toLocaleString()} items`;
+
+  // Open opps = count unique oppKey values with a non-Done status
+  const oppKeys = [...new Set(rows.map(r=>r.oppKey).filter(Boolean))];
+  const openOpps = oppKeys.filter(k => (oppStatuses[k]||'') !== 'Done').length;
+  document.getElementById('dash-open-opps').textContent = openOpps || oppKeys.length;
+  document.getElementById('dash-opps-delta').textContent = `Across ${oppKeys.length} tracked themes`;
+
+  // Trending themes = unique theme tags across all rows
+  const allThemes = [...new Set(rows.flatMap(r=>r.themes||[]).filter(Boolean))];
+  document.getElementById('dash-themes').textContent = allThemes.length;
+  document.getElementById('dash-themes-delta').textContent = `Unique themes in dataset`;
+  document.getElementById('dash-themes-delta').className = 'metric-delta delta-up';
+
+  // Avg sentiment = % positive or neutral (non-negative)
+  const negCount = rows.filter(r=>r.sent==='neg').length;
+  const posPct = Math.round(((total - negCount) / total) * 100);
+  document.getElementById('dash-sentiment').textContent = posPct + '%';
+  const sentDeltaEl = document.getElementById('dash-sentiment-delta');
+  sentDeltaEl.textContent = `${negCount.toLocaleString()} negative items (${Math.round((negCount/total)*100)}%)`;
+  sentDeltaEl.className = 'metric-delta ' + (posPct >= 60 ? 'delta-up' : 'delta-down');
+
+  // ── Spark rows (top themes by mention count) ─────────────────
+  const themeCounts = {};
+  rows.forEach(r => (r.themes||[]).forEach(t => { themeCounts[t] = (themeCounts[t]||0) + 1; }));
+  const sortedThemes = Object.entries(themeCounts).sort((a,b)=>b[1]-a[1]).slice(0,9);
+  const maxTheme = sortedThemes[0]?.[1] || 1;
+  const themeColors = ['#E24B4A','#E24B4A','#EF9F27','#EF9F27','#378ADD','#378ADD','#1D9E75','#1D9E75','#1D9E75'];
+  const sparkContainer = document.getElementById('dashSparkRows');
+  if (sparkContainer) {
+    sparkContainer.innerHTML = sortedThemes.map(([theme, count], i) => {
+      const pct = Math.round((count / maxTheme) * 100);
+      const color = themeColors[i] || '#378ADD';
+      const label = theme.charAt(0).toUpperCase() + theme.slice(1).replace(/-/g,' ');
+      return `<div class="spark-row" data-goto="opportunities">
+        <span class="spark-label">${label}</span>
+        <div class="spark-bar-wrap"><div class="spark-bar" style="width:${pct}%;background:${color}"></div></div>
+        <span class="spark-count">${count}</span>
+      </div>`;
+    }).join('');
+    // Re-attach click handlers
+    sparkContainer.querySelectorAll('.spark-row[data-goto]').forEach(row => {
+      row.addEventListener('click', () => navigate(row.dataset.goto));
+    });
+  }
+
+  // ── Source breakdown ─────────────────────────────────────────
+  const sourceCounts = {};
+  rows.forEach(r => { const s = r.srcLabel||'Unknown'; sourceCounts[s]=(sourceCounts[s]||0)+1; });
+  const sourceColors = {
+    'Salesforce':'#E24B4A', 'CSAT':'#378ADD', 'NPS':'#EF9F27',
+    'Slack B2B':'#1D9E75', 'Property B2B CSAT':'#4854D3',
+    'Property Frend':'#7F77DD', 'Motors Sell CSAT':'#FFEB33', 'Unknown':'#9b9b9b'
+  };
+  const sortedSources = Object.entries(sourceCounts).sort((a,b)=>b[1]-a[1]);
+  const sourceListEl = document.getElementById('dashSourceList');
+  if (sourceListEl) {
+    sourceListEl.innerHTML = sortedSources.map(([name, count]) => {
+      const pct = Math.round((count/total)*100);
+      const color = sourceColors[name] || '#9b9b9b';
+      const outline = name === 'Motors Sell CSAT' ? ';outline:1px solid #bbb' : '';
+      return `<div class="source-row">
+        <div class="source-dot" style="background:${color}${outline}"></div>
+        <span class="source-name">${name}</span>
+        <span class="source-count">${count.toLocaleString()}</span>
+        <span class="source-pct">${pct}%</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Volume bar chart (by day of week from dates) ──────────────
   const vctx = document.getElementById('dashVolumeChart');
   if (!vctx) return;
   if (dashVolumeChartInst) { dashVolumeChartInst.destroy(); dashVolumeChartInst = null; }
+
+  // Count mentions per source for donut
+  const donutLabels = sortedSources.map(([n])=>n);
+  const donutData   = sortedSources.map(([,c])=>c);
+  const donutColors = sortedSources.map(([n])=>sourceColors[n]||'#9b9b9b');
+
+  // Volume chart: bucket rows into last 10 weeks by week
+  const now = new Date();
+  const weekBuckets = Array(10).fill(0);
+  const weekLabels  = [];
+  for (let i = 9; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i * 7);
+    weekLabels.push(`W${10-i}`);
+  }
+  rows.forEach(r => {
+    if (!r.date) return;
+    // parse relative dates like "Today", "Yesterday", "N days ago", or absolute
+    let d = null;
+    const raw = (r.date||'').toLowerCase().trim();
+    if (raw.startsWith('today')) d = new Date(now);
+    else if (raw.startsWith('yesterday')) { d = new Date(now); d.setDate(d.getDate()-1); }
+    else if (/(\d+) days? ago/.test(raw)) { const m=raw.match(/(\d+)/); d=new Date(now); d.setDate(d.getDate()-parseInt(m[1])); }
+    else { d = new Date(r.date); }
+    if (!d || isNaN(d)) return;
+    const msAgo = now - d;
+    const weeksAgo = Math.floor(msAgo / (7*24*3600*1000));
+    const idx = 9 - weeksAgo;
+    if (idx >= 0 && idx < 10) weekBuckets[idx]++;
+  });
+
   dashVolumeChartInst = new Chart(vctx.getContext('2d'), {
     type: 'bar',
     data: {
-      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      labels: weekLabels,
       datasets: [{
         label: 'Feedback items',
-        data: [142, 198, 167, 251, 219, 187, 183],
-        backgroundColor: ['#B5D4F4','#E24B4A','#85B7EB','#185FA5','#378ADD','#378ADD','#85B7EB'],
+        data: weekBuckets,
+        backgroundColor: weekBuckets.map((_,i) => i===9 ? '#E24B4A' : '#378ADD'),
         borderRadius: 4,
         borderSkipped: false
       }]
@@ -2870,17 +2964,17 @@ function initDashboardCharts() {
     }
   });
 
-  // Source donut chart
+  // ── Source donut chart ────────────────────────────────────────
   const sctx = document.getElementById('dashSourceChart');
   if (!sctx) return;
   if (dashSourceChartInst) { dashSourceChartInst.destroy(); dashSourceChartInst = null; }
   dashSourceChartInst = new Chart(sctx.getContext('2d'), {
     type: 'doughnut',
     data: {
-      labels: ['Salesforce', 'CSAT', 'NPS', 'Slack'],
+      labels: donutLabels,
       datasets: [{
-        data: [1204, 847, 512, 284],
-        backgroundColor: ['#E24B4A','#378ADD','#EF9F27','#1D9E75'],
+        data: donutData,
+        backgroundColor: donutColors,
         borderWidth: 2,
         borderColor: '#fff',
         hoverOffset: 4
