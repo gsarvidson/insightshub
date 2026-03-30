@@ -983,26 +983,30 @@ body { background: var(--color-background-tertiary) !important; font-family: var
 // Replace these values with your own from supabase.com/dashboard
 // Project Settings → API → URL + anon key
 // ══════════════════════════════════════════════════════════════
-const SUPABASE_URL  = 'https://goxuzkkgytbhkvwycttl.supabase.co';   // e.g. 'https://xxxx.supabase.co'
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdveHV6a2tneXRiaGt2d3ljdHRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NTI4NDYsImV4cCI6MjA5MDQyODg0Nn0.md6mGVjchdjEeh_9iTJcXjEA6PvnGEpeFUsK5WZuYmA';   // e.g. 'eyJhbGci...'
+const SUPABASE_URL  = '';   // e.g. 'https://xxxx.supabase.co'
+const SUPABASE_ANON = '';   // e.g. 'eyJhbGci...'
 
-let supabase = null;
+let sbClient = null;
 if (SUPABASE_URL && SUPABASE_ANON) {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  try {
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  } catch(e) {
+    console.warn('Supabase client init failed (CDN may not be loaded yet):', e.message);
+  }
 }
 
 // ── Live data holders (populated from Supabase when configured) ───────────────
 let liveFeedback = null;       // replaces feedbackRows when loaded
 let liveOpps = null;           // replaces oppData when loaded
-let supabaseReady = false;
+let sbClientReady = false;
 
 async function loadFromSupabase() {
-  if (!supabase) return;
+  if (!sbClient) return;
   try {
     const [fbResult, oppResult, oppSrcResult] = await Promise.all([
-      supabase.from('feedback').select('*').order('date_actual', { ascending: false }),
-      supabase.from('opportunities').select('*').order('mentions', { ascending: false }),
-      supabase.from('opportunity_sources').select('*'),
+      sbClient.from('feedback').select('*').order('date_actual', { ascending: false }),
+      sbClient.from('opportunities').select('*').order('mentions', { ascending: false }),
+      sbClient.from('opportunity_sources').select('*'),
     ]);
 
     if (fbResult.error || oppResult.error) throw (fbResult.error || oppResult.error);
@@ -1058,7 +1062,7 @@ async function loadFromSupabase() {
       };
     });
 
-    supabaseReady = true;
+    sbClientReady = true;
     console.log(`✅ Supabase loaded: ${liveFeedback.length} feedback rows, ${oppResult.data.length} opportunities`);
 
     // Re-render active page with live data
@@ -1078,8 +1082,8 @@ function showSupabaseBanner() {
 
 // Sync an opportunity status update back to Supabase
 async function syncStatusToSupabase(oppKey, newStatus) {
-  if (!supabase) return;
-  const { error } = await supabase
+  if (!sbClient) return;
+  const { error } = await sbClient
     .from('opportunities')
     .update({ status: newStatus, updated_at: new Date().toISOString() })
     .eq('opp_key', oppKey);
@@ -1088,8 +1092,8 @@ async function syncStatusToSupabase(oppKey, newStatus) {
 
 // Save a manually added feedback row to Supabase
 async function saveFeedbackToSupabase(row) {
-  if (!supabase) return;
-  const { error } = await supabase.from('feedback').insert([{
+  if (!sbClient) return;
+  const { error } = await sbClient.from('feedback').insert([{
     text: row.text,
     meta: row.meta,
     src: row.src,
@@ -2249,7 +2253,7 @@ let activeDrawerRow = null;
 
 function renderFeedbackTable() {
   const tbody = document.getElementById('feedbackTableBody');
-  const rows = (supabaseReady && liveFeedback) ? liveFeedback : feedbackRows;
+  const rows = (sbClientReady && liveFeedback) ? liveFeedback : feedbackRows;
   tbody.innerHTML = rows.map((row, i) => `
     <tr data-idx="${i}">
       <td><div class="cell-text">${row.text}</div><div class="cell-meta">${row.meta}</div></td>
@@ -2283,7 +2287,7 @@ function renderFeedbackTable() {
 }
 
 function renderDrawer(idx) {
-  const rows = (supabaseReady && liveFeedback) ? liveFeedback : feedbackRows;
+  const rows = (sbClientReady && liveFeedback) ? liveFeedback : feedbackRows;
   const row = rows[idx];
   const d = row.drawer;
   const drawer = document.getElementById('feedbackDrawer');
@@ -2361,8 +2365,17 @@ function renderDrawer(idx) {
 }
 
 renderFeedbackTable();
-// Attempt to load live data from Supabase (no-op if credentials not set)
-loadFromSupabase();
+// Attempt to load live data from Supabase after page fully loads (ensures CDN is ready)
+window.addEventListener('load', () => {
+  if (SUPABASE_URL && SUPABASE_ANON && !sbClient) {
+    try {
+      sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    } catch(e) {
+      console.warn('Supabase init on load failed:', e.message);
+    }
+  }
+  loadFromSupabase();
+});
 // Hide drawer on initial load - open only when a row is clicked
 document.getElementById('feedbackDrawer').classList.add('hidden');
 document.getElementById('feedbackLayout').classList.add('no-drawer');
