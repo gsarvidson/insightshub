@@ -142,6 +142,11 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .toolbar .spacer { display: none; }
 }
 
 .tb-btn {

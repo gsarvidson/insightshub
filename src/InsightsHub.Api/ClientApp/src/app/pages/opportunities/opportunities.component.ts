@@ -38,6 +38,12 @@ export class OpportunitiesComponent implements OnInit {
   loading        = signal(true);
   relatedFeedback = signal<FeedbackItem[]>([]);
 
+  newModalOpen = signal(false);
+  newTitle     = signal('');
+  newSub       = signal('');
+  newStatus    = signal('Backlog');
+  newSaving    = signal(false);
+
   readonly filteredOpps = computed(() => {
     const filter = this.activeFilter();
     const opps = this.allOpps();
@@ -93,6 +99,32 @@ export class OpportunitiesComponent implements OnInit {
       this.allOpps.update(opps =>
         opps.map(o => o.id === id ? { ...o, status: newStatus } : o)
       );
+    });
+  }
+
+  openNewModal() {
+    this.newModalOpen.set(true);
+  }
+
+  closeNewModal() {
+    this.newModalOpen.set(false);
+    this.newTitle.set('');
+    this.newSub.set('');
+    this.newStatus.set('Backlog');
+  }
+
+  submitNew() {
+    const title = this.newTitle().trim();
+    if (!title || this.newSaving()) return;
+    this.newSaving.set(true);
+    this.oppService.create({ title, sub: this.newSub().trim(), status: this.newStatus() }).subscribe({
+      next: opp => {
+        this.allOpps.update(list => [opp, ...list]);
+        this.newSaving.set(false);
+        this.closeNewModal();
+        this.selectOpp(opp.id);
+      },
+      error: () => this.newSaving.set(false),
     });
   }
 

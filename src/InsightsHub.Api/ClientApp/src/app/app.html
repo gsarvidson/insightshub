@@ -1,6 +1,16 @@
 <div class="shell">
+  <!-- ── Mobile header ── -->
+  <header class="mobile-header">
+    <button class="hamburger" (click)="toggleNav()" aria-label="Open menu">&#9776;</button>
+    <img src="reimagine.png" alt="Insights Hub" class="mobile-logo-img" />
+    <span class="mobile-logo-name">INSIGHTS HUB</span>
+  </header>
+
+  <!-- ── Nav backdrop ── -->
+  <div class="nav-backdrop" [class.active]="navOpen()" (click)="closeNav()"></div>
+
   <!-- ── Navigation ── -->
-  <nav class="nav">
+  <nav class="nav" [class.nav-open]="navOpen()">
     <div class="nav-logo">
       <img src="reimagine.png" alt="Reimagine logo" class="nav-logo-img" />
       <div class="nav-logo-name">INSIGHTS HUB</div>
@@ -10,7 +20,8 @@
     @for (item of primaryNav; track item.route) {
       <a class="nav-item"
          [routerLink]="item.route"
-         routerLinkActive="active">
+         routerLinkActive="active"
+         (click)="closeNav()">
         {{ item.label }}
       </a>
     }
@@ -20,7 +31,8 @@
     @for (item of secondaryNav; track item.route) {
       <a class="nav-item"
          [routerLink]="item.route"
-         routerLinkActive="active">
+         routerLinkActive="active"
+         (click)="closeNav()">
         {{ item.label }}
       </a>
     }

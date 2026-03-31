@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 interface NavItem {
@@ -13,6 +13,10 @@ interface NavItem {
   styleUrl: './app.scss',
 })
 export class App {
+  navOpen = signal(false);
+  toggleNav() { this.navOpen.update(v => !v); }
+  closeNav()  { this.navOpen.set(false); }
+
   readonly primaryNav: NavItem[] = [
     { label: 'Dashboard', route: 'dashboard' },
     { label: 'Opportunities', route: 'opportunities' },

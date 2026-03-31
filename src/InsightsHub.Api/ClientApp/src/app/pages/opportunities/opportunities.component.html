@@ -11,7 +11,7 @@
         </button>
       }
       <div class="spacer"></div>
-      <button class="new-btn">+ New</button>
+      <button class="new-btn" (click)="openNewModal()">+ New</button>
     </div>
 
     <!-- Opportunity cards -->
@@ -41,6 +41,46 @@
     }
   </div>
 </div>
+
+<!-- New opportunity modal -->
+@if (newModalOpen()) {
+  <div class="modal-backdrop" (click)="closeNewModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">New Opportunity</span>
+        <button class="close-btn" (click)="closeNewModal()">✕</button>
+      </div>
+
+      <div class="af-field">
+        <label class="af-label">Title <span class="af-req">*</span></label>
+        <input class="af-input" [value]="newTitle()" (input)="newTitle.set($any($event.target).value)"
+               placeholder="e.g. Improve search relevance" />
+      </div>
+
+      <div class="af-field">
+        <label class="af-label">Description <span class="af-hint">(optional)</span></label>
+        <textarea class="af-textarea" rows="3" [value]="newSub()" (input)="newSub.set($any($event.target).value)"
+                  placeholder="Brief description of the opportunity"></textarea>
+      </div>
+
+      <div class="af-field">
+        <label class="af-label">Status</label>
+        <select class="af-select" [value]="newStatus()" (change)="newStatus.set($any($event.target).value)">
+          @for (s of availableStatuses; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="modal-footer">
+        <button class="act-btn" (click)="closeNewModal()">Cancel</button>
+        <button class="act-btn primary" [disabled]="!newTitle().trim() || newSaving()" (click)="submitNew()">
+          {{ newSaving() ? 'Saving…' : 'Create' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
 
 <!-- Overlay backdrop -->
 <div class="overlay-backdrop" [class.active]="detailOpen()" (click)="closeDetail()"></div>
