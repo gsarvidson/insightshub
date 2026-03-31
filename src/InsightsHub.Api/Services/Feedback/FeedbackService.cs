@@ -12,9 +12,9 @@ public class FeedbackService(
 {
     public async Task<FeedbackPage> GetFeedbackAsync(
         int page, int pageSize,
-        string? source, string? sentiment, string? theme, string? search)
+        string? source, string? sentiment, string? theme, string? search, string? oppId = null)
     {
-        var (entities, total) = await repository.GetPagedAsync(page, pageSize, source, sentiment, theme, search);
+        var (entities, total) = await repository.GetPagedAsync(page, pageSize, source, sentiment, theme, search, oppId);
         var items = entities.Select(Map).ToList();
         return new FeedbackPage(items, total, page, pageSize);
     }

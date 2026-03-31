@@ -12,9 +12,9 @@ public static class FeedbackEndpoints
         app.MapGet("/api/feedback", async (IFeedbackService svc,
             int page = 1, int pageSize = 10,
             string? source = null, string? sentiment = null,
-            string? theme = null, string? search = null) =>
+            string? theme = null, string? search = null, string? opp = null) =>
         {
-            var result = await svc.GetFeedbackAsync(page, pageSize, source, sentiment, theme, search);
+            var result = await svc.GetFeedbackAsync(page, pageSize, source, sentiment, theme, search, opp);
             return Results.Ok(result);
         }).WithName("GetFeedback");
 
@@ -57,6 +57,12 @@ public static class FeedbackEndpoints
             var linked = await svc.LinkOpportunityAsync(id, req.OppId);
             return linked ? Results.Ok(new { success = true }) : Results.NotFound();
         }).WithName("LinkFeedbackOpportunity");
+
+        app.MapGet("/api/feedback/by-opportunity/{oppId}", async (IFeedbackService svc, string oppId, int limit = 5) =>
+        {
+            var items = await svc.GetFeedbackForContextAsync(null, oppId, limit);
+            return Results.Ok(items);
+        }).WithName("GetFeedbackByOpportunity");
 
         app.MapGet("/api/feedback/options", async (InsightsHubDbContext db) =>
         {

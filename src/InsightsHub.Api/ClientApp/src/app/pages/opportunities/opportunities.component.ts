@@ -1,7 +1,10 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { OpportunityService } from '../../core/services/opportunity.service';
 import { Opportunity } from '../../core/models/opportunity.model';
+import { FeedbackService } from '../../core/services/feedback.service';
+import { FeedbackItem } from '../../core/models/feedback.model';
 
 const STATUS_FILTERS = ['All', 'Urgent', 'Under review', 'On roadmap', 'Backlog', 'Done'] as const;
 type StatusFilter = (typeof STATUS_FILTERS)[number];
@@ -16,20 +19,24 @@ const STATUS_CLASS: Record<string, string> = {
 
 @Component({
   selector: 'app-opportunities',
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe],
   templateUrl: './opportunities.component.html',
   styleUrl: './opportunities.component.scss',
 })
 export class OpportunitiesComponent implements OnInit {
-  private readonly oppService = inject(OpportunityService);
+  private readonly oppService      = inject(OpportunityService);
+  private readonly feedbackService = inject(FeedbackService);
+  private readonly route           = inject(ActivatedRoute);
+  private readonly router          = inject(Router);
 
   readonly filters = STATUS_FILTERS;
-  activeFilter = signal<StatusFilter>('All');
-  allOpps      = signal<Opportunity[]>([]);
-  selectedId   = signal<string | null>(null);
-  detailOpen   = signal(false);
+  activeFilter   = signal<StatusFilter>('All');
+  allOpps        = signal<Opportunity[]>([]);
+  selectedId     = signal<string | null>(null);
+  detailOpen     = signal(false);
   statusDropOpen = signal(false);
-  loading      = signal(true);
+  loading        = signal(true);
+  relatedFeedback = signal<FeedbackItem[]>([]);
 
   readonly filteredOpps = computed(() => {
     const filter = this.activeFilter();
@@ -44,8 +51,13 @@ export class OpportunitiesComponent implements OnInit {
   readonly availableStatuses = STATUS_FILTERS.filter(s => s !== 'All');
 
   ngOnInit() {
+    const targetId = this.route.snapshot.queryParamMap.get('id');
     this.oppService.getAll().subscribe({
-      next: opps => { this.allOpps.set(opps); this.loading.set(false); },
+      next: opps => {
+        this.allOpps.set(opps);
+        this.loading.set(false);
+        if (targetId) this.selectOpp(targetId);
+      },
       error: () => this.loading.set(false),
     });
   }
@@ -57,10 +69,15 @@ export class OpportunitiesComponent implements OnInit {
   selectOpp(id: string) {
     this.selectedId.set(id);
     this.detailOpen.set(true);
+    this.relatedFeedback.set([]);
+    this.feedbackService.getPreviewByOpportunity(id).subscribe({
+      next: items => this.relatedFeedback.set(items),
+    });
   }
 
   closeDetail() {
     this.detailOpen.set(false);
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
     setTimeout(() => this.selectedId.set(null), 300);
   }
 

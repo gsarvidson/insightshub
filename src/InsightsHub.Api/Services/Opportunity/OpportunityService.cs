@@ -31,7 +31,7 @@ public class OpportunityService(
         if (!string.IsNullOrWhiteSpace(statusFilter))
             opportunities = opportunities.Where(o => o.Status.Equals(statusFilter, StringComparison.OrdinalIgnoreCase)).ToList();
 
-        return opportunities;
+        return [.. opportunities.OrderByDescending(op => op.Mentions)];
     }
 
     public async Task<OpportunityModel?> GetOpportunityAsync(string id)

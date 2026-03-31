@@ -108,9 +108,22 @@
       }
     </div>
 
+    <!-- Related feedback preview -->
+    @if (relatedFeedback().length > 0) {
+      <div class="opp-section">
+        <div class="opp-section-label">Related feedback</div>
+        @for (fb of relatedFeedback(); track fb.id) {
+          <div class="feedback-item">
+            <div class="fb-source">{{ fb.srcLabel }}{{ fb.date ? ' · ' + (fb.date | date:'d MMM y') : '' }}</div>
+            <div class="fb-text">{{ fb.text }}</div>
+          </div>
+        }
+      </div>
+    }
+
     <!-- Action links -->
     <div class="opp-action-links">
-      <a class="action-link" [routerLink]="['/feedback']">View related feedback →</a>
+      <a class="action-link" [routerLink]="['/feedback']" [queryParams]="{ opp: selectedOpp()?.id }">View related feedback →</a>
     </div>
   </div>
 }

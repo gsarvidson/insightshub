@@ -6,7 +6,7 @@ public interface IFeedbackRepository
 {
     Task<(List<FeedbackItemEntity> Items, int Total)> GetPagedAsync(
         int page, int pageSize,
-        string? src, string? sentiment, string? theme, string? search);
+        string? src, string? sentiment, string? theme, string? search, string? oppId = null);
 
     Task<FeedbackItemEntity> AddAsync(FeedbackItemEntity entity, IEnumerable<string>? themeNames = null, string? sourceName = null, string? teamName = null);
 

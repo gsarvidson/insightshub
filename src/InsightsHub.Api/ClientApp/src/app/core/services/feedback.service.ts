@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
-import { AddFeedbackRequest, FeedbackOptions, FeedbackPage, FeedbackTrendsResult } from '../models/feedback.model';
+import { AddFeedbackRequest, FeedbackItem, FeedbackOptions, FeedbackPage, FeedbackTrendsResult } from '../models/feedback.model';
 
 export interface FeedbackFilters {
   page?: number;
@@ -10,6 +10,7 @@ export interface FeedbackFilters {
   sentiment?: string;
   theme?: string;
   search?: string;
+  opp?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -25,6 +26,7 @@ export class FeedbackService {
     if (filters.sentiment) params['sentiment'] = filters.sentiment;
     if (filters.theme)     params['theme'] = filters.theme;
     if (filters.search)    params['search'] = filters.search;
+    if (filters.opp)       params['opp'] = filters.opp;
     return this.api.get<FeedbackPage>('/feedback', params);
   }
 
@@ -49,6 +51,10 @@ export class FeedbackService {
 
   linkOpportunity(feedbackId: string, oppId: string): Observable<{ success: boolean }> {
     return this.api.patch<{ success: boolean }>(`/feedback/${feedbackId}/opportunity`, { oppId });
+  }
+
+  getPreviewByOpportunity(oppId: string, limit = 5): Observable<FeedbackItem[]> {
+    return this.api.get<FeedbackItem[]>(`/feedback/by-opportunity/${oppId}`, { limit });
   }
 
   searchTags(q: string): Observable<{ name: string; color: string }[]> {

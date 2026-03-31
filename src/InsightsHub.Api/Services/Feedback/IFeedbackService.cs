@@ -6,7 +6,7 @@ public interface IFeedbackService
 {
     Task<FeedbackPage> GetFeedbackAsync(
         int page, int pageSize,
-        string? source, string? sentiment, string? theme, string? search);
+        string? source, string? sentiment, string? theme, string? search, string? oppId = null);
 
     Task AddFeedbackAsync(AddFeedbackRequest req);
 

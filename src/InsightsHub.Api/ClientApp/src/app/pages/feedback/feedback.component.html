@@ -58,6 +58,9 @@
       <input class="search-input" type="text" placeholder="Search feedback…"
              [(ngModel)]="searchText" (ngModelChange)="applyFilters()" />
       <span class="clear-btn" (click)="clearFilters()">Clear</span>
+      @if (oppFilter()) {
+        <span class="active-filter-pill">Opportunity filter active <span class="pill-x" (click)="oppFilter.set(''); loadPage()">✕</span></span>
+      }
     </div>
 
     <!-- Table -->
@@ -92,7 +95,7 @@
               </td>
               <td>
                 @if (item.oppKey) {
-                  <a class="opp-link" [routerLink]="['/opportunities']">{{ item.opp }}</a>
+                  <a class="opp-link" [routerLink]="['/opportunities']" [queryParams]="{ id: item.oppKey }" (click)="$event.stopPropagation()">{{ item.opp }}</a>
                 } @else {
                   <span class="text-muted">—</span>
                 }

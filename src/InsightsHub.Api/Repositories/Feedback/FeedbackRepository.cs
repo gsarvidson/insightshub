@@ -8,7 +8,7 @@ public class FeedbackRepository(InsightsHubDbContext context) : BaseRepository(c
 {
     public async Task<(List<FeedbackItemEntity> Items, int Total)> GetPagedAsync(
         int page, int pageSize,
-        string? src, string? sentiment, string? theme, string? search)
+        string? src, string? sentiment, string? theme, string? search, string? oppId = null)
     {
         var query = Context.FeedbackItems
             .Include(f => f.DataSources)
@@ -25,6 +25,9 @@ public class FeedbackRepository(InsightsHubDbContext context) : BaseRepository(c
 
         if (!string.IsNullOrWhiteSpace(theme))
             query = query.Where(f => f.Tags.Any(t => t.Name == theme));
+
+        if (!string.IsNullOrWhiteSpace(oppId))
+            query = query.Where(f => f.OpportunityId == oppId);
 
         if (!string.IsNullOrWhiteSpace(search))
             query = query.Where(f =>

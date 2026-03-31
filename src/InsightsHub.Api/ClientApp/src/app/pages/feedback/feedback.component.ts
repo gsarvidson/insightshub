@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FeedbackService } from '../../core/services/feedback.service';
 import { OpportunityService } from '../../core/services/opportunity.service';
@@ -33,6 +33,8 @@ const FALLBACK_COLORS = ['#E24B4A','#EF9F27','#378ADD','#1D9E75','#9B59B6','#F0A
 export class FeedbackComponent implements OnInit, OnDestroy {
   private readonly feedbackService = inject(FeedbackService);
   private readonly opportunityService = inject(OpportunityService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   feedbackPage  = signal<FeedbackPage | null>(null);
   loading       = signal(true);
@@ -46,6 +48,7 @@ export class FeedbackComponent implements OnInit, OnDestroy {
   themeFilter     = signal('');
   dateFilter      = signal('10w');
   searchText      = signal('');
+  oppFilter       = signal('');
 
   // Tag autocomplete
   tagInputOpen    = signal(false);
@@ -80,6 +83,14 @@ export class FeedbackComponent implements OnInit, OnDestroy {
   );
 
   ngOnInit() {
+    const qp = this.route.snapshot.queryParamMap;
+    const page = parseInt(qp.get('page') ?? '1', 10);
+    if (page > 1) this.page.set(page);
+    const source = qp.get('source');    if (source)    this.sourceFilter.set(source);
+    const sentiment = qp.get('sentiment'); if (sentiment) this.sentimentFilter.set(sentiment);
+    const theme = qp.get('theme');      if (theme)     this.themeFilter.set(theme);
+    const search = qp.get('search');    if (search)    this.searchText.set(search);
+    const opp = qp.get('opp');          if (opp)       this.oppFilter.set(opp);
     this.loadPage();
     this.loadTrends();
     this.tagSearch$.pipe(
@@ -111,14 +122,28 @@ export class FeedbackComponent implements OnInit, OnDestroy {
     });
   }
 
+  private syncQueryParams() {
+    const params: Record<string, string | null> = {
+      page:      this.page() > 1 ? String(this.page()) : null,
+      source:    this.sourceFilter()    || null,
+      sentiment: this.sentimentFilter() || null,
+      theme:     this.themeFilter()     || null,
+      search:    this.searchText()      || null,
+      opp:       this.oppFilter()       || null,
+    };
+    this.router.navigate([], { relativeTo: this.route, queryParams: params, replaceUrl: true });
+  }
+
   loadPage() {
     this.loading.set(true);
+    this.syncQueryParams();
     this.feedbackService.getPage({
       page: this.page(),
       source: this.sourceFilter(),
       sentiment: this.sentimentFilter(),
       theme: this.themeFilter(),
       search: this.searchText(),
+      opp: this.oppFilter() || undefined,
     }).subscribe({
       next: p => { this.feedbackPage.set(p); this.loading.set(false); },
       error: () => this.loading.set(false),
@@ -145,6 +170,7 @@ export class FeedbackComponent implements OnInit, OnDestroy {
     this.themeFilter.set('');
     this.dateFilter.set('10w');
     this.searchText.set('');
+    this.oppFilter.set('');
     this.page.set(1);
     this.loadPage();
   }
