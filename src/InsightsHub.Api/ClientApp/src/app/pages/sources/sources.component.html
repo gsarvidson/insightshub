@@ -1,0 +1,161 @@
+<div class="main">
+  <div class="page-title">Sources &amp; settings</div>
+  <div class="page-sub">Manage data connections and your preferences</div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    @for (tab of tabs; track tab) {
+      <div class="tab" [class.active]="activeTab() === tab" (click)="activeTab.set(tab)">{{ tab }}</div>
+    }
+  </div>
+
+  @if (activeTab() === 'Data sources') {
+    <div class="section-label-sm">Connected sources</div>
+
+    @if (loading()) {
+      <div class="loading">Loading sources…</div>
+    }
+
+    @for (src of sources(); track src.id) {
+      <div class="source-card">
+        <div class="src-icon" [style.background]="src.iconBg" [style.color]="src.iconColor">{{ src.iconLabel }}</div>
+        <div class="src-body">
+          <div class="src-name">{{ src.name }}</div>
+          <div class="src-meta">Last synced {{ src.lastSynced }} · {{ src.description }}</div>
+          <div class="src-actions">
+            <span class="status-wrap">
+              <div class="status-dot" [style.background]="src.statusColor"></div>
+              <span [style.color]="src.statusColor">{{ src.status }}</span>
+            </span>
+            @for (action of src.actions; track action) {
+              <button class="src-btn" (click)="handleAction(src.id, action)">{{ action }}</button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <div class="add-card" (click)="openConnectModal()">
+      <div class="src-icon" style="background:var(--color-background-secondary);color:var(--color-text-tertiary);font-size:18px">+</div>
+      <div class="add-text">Connect a new source — Intercom, Zendesk, survey tools, CSV upload…</div>
+    </div>
+  }
+
+  @if (showModal()) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <span class="modal-title">Connect a source</span>
+          <button class="modal-close" (click)="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-hint">Choose how to import feedback data into Insights Hub.</p>
+          <div class="source-options">
+            <button class="source-opt disabled" disabled>
+              <span class="source-opt-icon">☁️</span>
+              <span class="source-opt-label">Salesforce</span>
+              <span class="source-opt-badge">Coming soon</span>
+            </button>
+            <button class="source-opt disabled" disabled>
+              <span class="source-opt-icon">💬</span>
+              <span class="source-opt-label">Slack</span>
+              <span class="source-opt-badge">Coming soon</span>
+            </button>
+            <button class="source-opt disabled" disabled>
+              <span class="source-opt-icon">🎧</span>
+              <span class="source-opt-label">Intercom</span>
+              <span class="source-opt-badge">Coming soon</span>
+            </button>
+            <button class="source-opt disabled" disabled>
+              <span class="source-opt-icon">🎫</span>
+              <span class="source-opt-label">Zendesk</span>
+              <span class="source-opt-badge">Coming soon</span>
+            </button>
+            <button class="source-opt" (click)="csvInput.click()" [disabled]="csvUploading()">
+              <span class="source-opt-icon">📄</span>
+              <span class="source-opt-label">CSV Upload</span>
+              <span class="source-opt-sub">Import feedback rows from a .csv file</span>
+            </button>
+          </div>
+
+          <input #csvInput type="file" accept=".csv" style="display:none" (change)="onCsvFile($event)">
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showCsvConfigModal()) {
+    <div class="modal-overlay" (click)="closeCsvConfigModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <button class="modal-back" (click)="backToConnectModal()" [disabled]="csvUploading()">← Back</button>
+          <span class="modal-title">Configure CSV import</span>
+          <button class="modal-close" (click)="closeCsvConfigModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="csv-file-info">
+            <span class="csv-file-icon">📄</span>
+            <div>
+              <div class="csv-file-name">{{ csvFileName() }}</div>
+              <div class="csv-file-rows">{{ csvPendingRows().length }} rows found</div>
+            </div>
+          </div>
+
+          <div class="csv-field">
+            <label class="csv-label">Source</label>
+            <select class="csv-select" (change)="onSourceChange($event)" [disabled]="csvUploading()">
+              @for (opt of csvSourceOptions; track opt) {
+                <option [value]="opt" [selected]="csvSource() === opt">{{ opt }}</option>
+              }
+            </select>
+            <div class="csv-field-hint">Applied to all rows as the feedback source.</div>
+          </div>
+
+          @if (csvUploading()) {
+            <div class="csv-progress">
+              <div class="csv-progress-bar">
+                <div class="csv-progress-fill" [style.width.%]="(csvProgress() / csvTotal()) * 100"></div>
+              </div>
+              <div class="csv-progress-text">Uploading {{ csvProgress() }} of {{ csvTotal() }} rows…</div>
+            </div>
+          }
+          @if (csvDone()) {
+            <div class="csv-status success">✓ {{ csvTotal() }} rows imported successfully.</div>
+          }
+          @if (csvError()) {
+            <div class="csv-status error">{{ csvError() }}</div>
+          }
+
+          <div class="csv-actions">
+            <button class="csv-cancel-btn" (click)="backToConnectModal()" [disabled]="csvUploading()">Cancel</button>
+            <button class="csv-import-btn" (click)="startCsvImport()" [disabled]="csvUploading() || csvDone()">
+              @if (csvUploading()) { Importing… } @else { Import {{ csvPendingRows().length }} rows }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'Saved views') {
+    <div class="section-label-sm" style="margin-top:1rem">Saved views</div>
+    <div class="saved-views">
+      @for (view of savedViews(); track view.name) {
+        <div class="view-row">
+          <span class="view-name">{{ view.name }}</span>
+          <span class="view-meta">{{ view.meta }}</span>
+          <button class="view-btn">Load</button>
+          <button class="view-btn">Edit</button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (activeTab() === 'Alerts') {
+    <div class="empty-tab">Alert configuration coming soon.</div>
+  }
+
+  @if (activeTab() === 'Preferences') {
+    <div class="empty-tab">Preferences coming soon.</div>
+  }
+</div>

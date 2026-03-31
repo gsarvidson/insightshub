@@ -1,0 +1,69 @@
+<div class="chat-pane">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="chat-header-main">
+      <div class="chat-title">AI Assistant</div>
+      <div class="chat-sub">Ask anything about your feedback data — powered by Claude</div>
+    </div>
+    <div class="ai-status-badge ai-status-connected">
+      <span class="ai-status-dot"></span>
+      Connected to Claude
+    </div>
+  </div>
+
+  <!-- Suggested questions -->
+  <div class="suggested">
+    <div class="sug-label">Suggested questions</div>
+    @for (q of suggestions; track q) {
+      <span class="sug-pill" (click)="fillSuggestion(q)">{{ q }}</span>
+    }
+  </div>
+
+  <!-- Messages -->
+  <div class="messages" #messagesEl>
+    @for (msg of messages(); track $index) {
+      <div class="msg" [class.user]="msg.role === 'user'">
+        <div class="avatar" [class.av-ai]="msg.role === 'assistant'" [class.av-user]="msg.role === 'user'">
+          {{ msg.role === 'user' ? 'Me' : 'AI' }}
+        </div>
+        <div class="bubble" [class.bubble-ai]="msg.role === 'assistant'" [class.bubble-user]="msg.role === 'user'"
+             [innerHTML]="formatContent(msg.content)">
+        </div>
+      </div>
+      @if (msg.role === 'assistant') {
+        <div class="ai-msg-actions">
+          <button class="export-btn" (click)="copyToClipboard(msg.content)">Copy summary</button>
+          <button class="export-btn" (click)="navigateTo('/opportunities')">Create opportunity →</button>
+        </div>
+      }
+    }
+
+    @if (isLoading()) {
+      <div class="msg">
+        <div class="avatar av-ai">AI</div>
+        <div class="bubble bubble-ai">
+          <div class="typing-indicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Input -->
+  <div class="input-row">
+    <textarea
+      class="chat-input"
+      rows="1"
+      placeholder="Ask about trends, themes, needs…"
+      [value]="inputText()"
+      (input)="inputText.set($any($event.target).value)"
+      (keydown)="handleKey($event)">
+    </textarea>
+    <button class="send-btn" [disabled]="isLoading() || !inputText().trim()" (click)="send()">
+      Send
+    </button>
+  </div>
+</div>

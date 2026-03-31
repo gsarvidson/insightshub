@@ -1,0 +1,116 @@
+<div class="opp-layout">
+  <div class="list-pane">
+    <div class="page-title">Opportunities</div>
+    <div class="page-sub">Auto AI generated opportunities based on feedback captured</div>
+
+    <!-- Filter toolbar -->
+    <div class="toolbar">
+      @for (f of filters; track f) {
+        <button class="tb-btn" [class.active]="activeFilter() === f" (click)="setFilter(f)">
+          {{ f }}
+        </button>
+      }
+      <div class="spacer"></div>
+      <button class="new-btn">+ New</button>
+    </div>
+
+    <!-- Opportunity cards -->
+    @if (loading()) {
+      <div class="loading">Loading…</div>
+    }
+    @for (opp of filteredOpps(); track opp.id) {
+      <div class="opp-card" [class.selected]="selectedId() === opp.id" (click)="selectOpp(opp.id)">
+        <div class="opp-head">
+          <span class="opp-title">{{ opp.title }}</span>
+          <span class="status-pill" [class]="statusClass(opp.status)">{{ opp.status }}</span>
+        </div>
+        <div class="opp-meta">
+          <span class="meta-item">{{ opp.mentions }} mentions</span>
+          <span class="meta-item">{{ opp.trend }}</span>
+          @for (team of opp.teams; track team) {
+            <span class="team-chip">{{ team }}</span>
+          }
+          <div class="score-bar-wrap">
+            <div class="score-bar" [style.width.%]="opp.scorePercent" [style.background]="opp.trendColor"></div>
+          </div>
+        </div>
+      </div>
+    }
+    @empty {
+      <div class="empty">No opportunities match this filter.</div>
+    }
+  </div>
+</div>
+
+<!-- Overlay backdrop -->
+<div class="overlay-backdrop" [class.active]="detailOpen()" (click)="closeDetail()"></div>
+
+<!-- Detail slide-in pane -->
+@if (selectedOpp(); as opp) {
+  <div class="slide-panel" [class.open]="detailOpen()">
+    <div class="detail-header">
+      <div>
+        <div class="detail-title">{{ opp.title }}</div>
+        <div class="detail-sub">{{ opp.sub }}</div>
+      </div>
+      <button class="close-btn" (click)="closeDetail()">✕</button>
+    </div>
+
+    <!-- Status pill with dropdown -->
+    <div class="detail-status-wrap">
+      <div class="detail-status-pill status-pill" [class]="statusClass(opp.status)"
+           (click)="statusDropOpen.set(!statusDropOpen())">
+        {{ opp.status }} <span class="caret">▾</span>
+      </div>
+      @if (statusDropOpen()) {
+        <div class="status-dropdown">
+          @for (s of availableStatuses; track s) {
+            <div class="status-dropdown-item" (click)="updateStatus(s)">
+              <span class="swatch status-pill" [class]="statusClass(s)" style="padding: 0; width: 10px; height: 10px; border-radius: 50%; display: inline-block;"></span>
+              {{ s }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Mention trend mini chart -->
+    <div class="opp-section">
+      <div class="opp-section-label">Mention trend (10 weeks)</div>
+      <div class="mini-trend-bars">
+        @for (bar of selectedOpp()?.trendBars ?? []; track $index; let last = $last) {
+          <div class="mini-bar" [class.mini-bar-last]="last" [style.height.px]="bar"></div>
+        }
+      </div>
+    </div>
+
+    <!-- Vertical / Team -->
+    @if (opp.teams?.length) {
+      <div class="section-label">Vertical / Team</div>
+      <div class="tag-row">
+        @for (team of opp.teams; track team) {
+          <span class="team-chip team-chip-detail">{{ team }}</span>
+        }
+      </div>
+    }
+
+    <!-- Sources -->
+    <div class="section-label">Sources</div>
+    @for (src of opp.sources; track src.name) {
+      <span class="source-chip">{{ src.name }} ({{ src.count }})</span>
+    }
+
+    <!-- Tags -->
+    <div class="section-label" style="margin-top: 1rem;">Tags</div>
+    <div class="tag-row">
+      @for (tag of opp.tags; track tag.name) {
+        <span class="tag" [style.border-color]="tag.color" [style.color]="tag.color">{{ tag.name }}</span>
+      }
+    </div>
+
+    <!-- Action links -->
+    <div class="opp-action-links">
+      <a class="action-link" [routerLink]="['/feedback']">View related feedback →</a>
+    </div>
+  </div>
+}

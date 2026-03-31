@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16
+    container_name: insights-hub-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: InsightsHub
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - insights-hub-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./src/InsightsHub.Api
+      dockerfile: Dockerfile
+    container_name: insights-hub-api
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      db-host: db
+      db-name: InsightsHub
+      db-username: postgres
+      db-password: postgres
+      ANTHROPIC__APIKEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC__MODEL: ${ANTHROPIC_MODEL}
+      ANTHROPIC__BASEURL: ${ANTHROPIC_BASE_URL}
+      ANTHROPIC__MAXTOKENS: ${ANTHROPIC_MAX_TOKENS}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    build:
+      context: ./src/InsightsHub.Api/ClientApp
+      dockerfile: Dockerfile
+    container_name: insights-hub-app
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+
+  worker:
+    build:
+      context: ./src
+      dockerfile: InsightsHub.Worker/Dockerfile
+    container_name: insights-hub-worker
+    environment:
+      db-host: db
+      db-name: InsightsHub
+      db-username: postgres
+      db-password: postgres
+      ANTHROPIC__APIKEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC__MODEL: ${ANTHROPIC_MODEL}
+      ANTHROPIC__BASEURL: ${ANTHROPIC_BASE_URL}
+      ANTHROPIC__MAXTOKENS: ${ANTHROPIC_MAX_TOKENS}
+      Worker__PollIntervalSeconds: 30
+      Worker__BatchSize: 10
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  insights-hub-pgdata:

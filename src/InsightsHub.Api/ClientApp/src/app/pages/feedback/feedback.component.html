@@ -1,0 +1,235 @@
+<div class="feedback-layout">
+  <div class="table-pane">
+    <div class="page-title">Feedback explorer</div>
+    <div class="page-sub">Browse, filter and explore all captured feedback</div>
+
+    <!-- Trend chart -->
+    <div class="chart-panel">
+      <div class="chart-panel-header">
+        <div>
+          <div class="chart-panel-title">Feedback trends by theme</div>
+          <div class="chart-panel-sub">Weekly mentions over last 10 weeks</div>
+        </div>
+        <div class="theme-toggles">
+          @for (s of themeSeries(); track s.label) {
+            <div class="theme-toggle" [class.inactive]="s.active === false"
+                 [style.background]="s.active !== false ? s.color + '18' : ''"
+                 [style.borderColor]="s.active !== false ? s.color : ''"
+                 [style.color]="s.active !== false ? s.color : ''"
+                 (click)="toggleTheme(s.label)">
+              <div class="theme-toggle-dot" [style.background]="s.color"></div>
+              {{ s.label }}
+            </div>
+          }
+        </div>
+      </div>
+      <app-d3-line-chart [series]="activeSeries()" [labels]="chartLabels" [height]="190" />
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <span class="filter-label">Filter:</span>
+      <select class="filter-select" [(ngModel)]="sourceFilter" (ngModelChange)="applyFilters()">
+        <option value="">All sources</option>
+        <option value="sf">Salesforce</option>
+        <option value="csat">CSAT</option>
+        <option value="nps">NPS</option>
+        <option value="slack">Slack B2B</option>
+      </select>
+      <select class="filter-select" [value]="themeFilter()" (change)="setThemeFilter($any($event.target).value)">
+        <option value="">All themes</option>
+        <option value="Payments">Payments</option>
+        <option value="Search">Search</option>
+        <option value="Messaging">Messaging</option>
+        <option value="Photos">Photos</option>
+        <option value="Pricing">Pricing</option>
+      </select>
+      <select class="filter-select" [(ngModel)]="sentimentFilter" (ngModelChange)="applyFilters()">
+        <option value="">All sentiment</option>
+        <option value="neg">Negative</option>
+        <option value="neu">Neutral</option>
+        <option value="pos">Positive</option>
+      </select>
+      <select class="filter-select" [value]="dateFilter()" (change)="setDateFilter($any($event.target).value)">
+        <option value="10w">Last 10 weeks</option>
+        <option value="4w">Last 4 weeks</option>
+        <option value="2w">Last 2 weeks</option>
+      </select>
+      <input class="search-input" type="text" placeholder="Search feedback…"
+             [(ngModel)]="searchText" (ngModelChange)="applyFilters()" />
+      <span class="clear-btn" (click)="clearFilters()">Clear</span>
+    </div>
+
+    <!-- Table -->
+    @if (loading()) {
+      <div style="font-size:13px;color:var(--color-text-tertiary);padding:1rem">Loading…</div>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Feedback</th>
+            <th>Source</th>
+            <th>Date</th>
+            <th>Sentiment</th>
+            <th>Themes</th>
+            <th>Opportunity</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of feedbackPage()?.items ?? []; track item.id) {
+            <tr [class.selected]="selectedId() === item.id" (click)="selectRow(item.id)">
+              <td>
+                <div class="cell-text">{{ item.text }}</div>
+                <div class="cell-meta">{{ item.meta }}</div>
+              </td>
+              <td><span [class]="srcClass(item.src)">{{ item.srcLabel }}</span></td>
+              <td style="white-space:nowrap;font-size:11px;color:var(--color-text-tertiary)">{{ item.date }}</td>
+              <td><span [class]="sentClass(item.sentiment)">{{ sentLabel(item.sentiment) }}</span></td>
+              <td>
+                @for (t of item.themes; track t.name) {
+                  <span class="theme-tag" [style.border-color]="t.color" [style.color]="t.color">{{ t.name }}</span>
+                }
+              </td>
+              <td>
+                @if (item.oppKey) {
+                  <a class="opp-link" [routerLink]="['/opportunities']">{{ item.opp }}</a>
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <span>{{ pageInfo }}</span>
+        <div style="display:flex;gap:6px">
+          <button class="pg-btn" [disabled]="!hasPrev" (click)="prevPage()">← Prev</button>
+          <button class="pg-btn" [disabled]="!hasNext" (click)="nextPage()">Next →</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Drawer overlay -->
+<div class="overlay-backdrop" [class.active]="drawerOpen()" (click)="closeDrawer()"></div>
+
+<!-- Feedback detail panel -->
+@if (selectedItem(); as item) {
+  <div class="slide-panel" [class.open]="drawerOpen()">
+    <div class="drawer-header">
+      <div class="drawer-title">{{ item.text }}</div>
+      <button class="close-btn" (click)="closeDrawer()">✕</button>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-box"><div class="meta-label">Case ID</div><div class="meta-val">{{ item.id }}</div></div>
+      <div class="meta-box"><div class="meta-label">Date</div><div class="meta-val">{{ item.date }}</div></div>
+      <div class="meta-box"><div class="meta-label">Sentiment</div><div class="meta-val" [style.color]="item.sentimentColor">{{ sentLabel(item.sentiment) }}</div></div>
+      <div class="meta-box"><div class="meta-label">User type</div><div class="meta-val">{{ item.userType }}</div></div>
+      <div class="meta-box"><div class="meta-label">Platform</div><div class="meta-val">{{ item.platform || '-' }}</div></div>
+    </div>
+
+    <div class="drawer-section">Verbatim</div>
+    <div class="verbatim-box">{{ item.text }}</div>
+
+    <div class="drawer-section">Tags</div>
+    <div class="tag-area">
+      @for (tag of item.themes; track tag.name) {
+        <span class="tag" [style.border-color]="tag.color" [style.color]="tag.color">{{ tag.name }}</span>
+      }
+
+      @if (tagInputOpen()) {
+        <div class="tag-input-wrap">
+          <input #tagInput class="tag-input" type="text" placeholder="Type 3+ chars…" autofocus
+                 [value]="tagInputValue()"
+                 (input)="onTagInputChange($any($event.target).value)"
+                 (keydown.escape)="closeTagInput()" />
+          @if (tagSearching()) {
+            <div class="tag-dropdown"><div class="tag-drop-empty">Searching…</div></div>
+          } @else if (tagSuggestions().length > 0) {
+            <div class="tag-dropdown">
+              @for (s of tagSuggestions(); track s.name) {
+                <div class="tag-drop-row" (mousedown)="pickTag(s)">
+                  <span class="tag-drop-dot" [style.background]="s.color"></span>
+                  {{ s.name }}
+                </div>
+              }
+            </div>
+          } @else if (tagInputValue().length >= 3) {
+            <div class="tag-dropdown"><div class="tag-drop-empty">No matching tags</div></div>
+          }
+        </div>
+      } @else {
+        <button class="act-btn" (click)="openTagInput()">Add tags</button>
+      }
+    </div>
+
+    @if (item.oppKey) {
+      <div class="drawer-section">Linked opportunity</div>
+      <div class="opp-link-row">
+        <span class="opp-link-name">{{ item.opp }}</span>
+      </div>
+    }
+
+    <div class="drawer-section">AI note</div>
+    <div class="ai-suggest">
+      <div class="ai-suggest-label">AI insight</div>
+      {{ item.aiNote }}
+    </div>
+
+    <div class="action-row">
+      <button class="act-btn primary" (click)="openLinkModal()">
+        {{ item.oppKey ? 'Change opportunity' : 'Link to opportunity' }}
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Link opportunity modal -->
+@if (linkModalOpen()) {
+  <div class="modal-backdrop" (click)="closeLinkModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">Link to opportunity</span>
+        <button class="close-btn" (click)="closeLinkModal()">✕</button>
+      </div>
+
+      <input class="modal-search" type="text" placeholder="Search opportunities…"
+             [ngModel]="oppSearch()" (ngModelChange)="oppSearch.set($event)" />
+
+      <div class="modal-list">
+        @if (oppListLoading()) {
+          <div class="modal-empty">Loading…</div>
+        } @else if (filteredOpps().length === 0) {
+          <div class="modal-empty">No opportunities found</div>
+        } @else {
+          @for (opp of filteredOpps(); track opp.id) {
+            <div class="modal-opp-row" [class.active]="selectedOppId() === opp.id"
+                 (click)="selectedOppId.set(opp.id)">
+              <div class="modal-opp-dot" [style.background]="opp.color"></div>
+              <div class="modal-opp-body">
+                <div class="modal-opp-title">{{ opp.title }}</div>
+                <div class="modal-opp-sub">{{ opp.sub }}</div>
+              </div>
+              @if (selectedOppId() === opp.id) {
+                <span class="modal-opp-check">✓</span>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="act-btn" (click)="closeLinkModal()">Cancel</button>
+        <button class="act-btn primary" [disabled]="!selectedOppId() || linkSaving()"
+                (click)="confirmLink()">
+          {{ linkSaving() ? 'Saving…' : 'Confirm link' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,97 @@
+<div class="main">
+  @if (loading()) {
+    <div class="loading">Loading…</div>
+  } @else if (summary(); as s) {
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub">Last 30 days · All sources</div>
+
+    <!-- Metrics row -->
+    <div class="metrics metrics-4">
+      <app-metric-card
+        label="Total feedback"
+        [value]="s.metrics.totalFeedback.toLocaleString()"
+        [delta]="s.metrics.totalFeedbackDelta"
+        deltaClass="up" />
+      <app-metric-card
+        label="Open opportunities"
+        [value]="s.metrics.openOpportunities.toString()"
+        [delta]="s.metrics.openOpportunitiesDelta"
+        deltaClass="up" />
+      <app-metric-card
+        label="Trending themes"
+        [value]="s.metrics.trendingThemes.toString()"
+        [delta]="s.metrics.trendingThemesDelta"
+        deltaClass="up" />
+      <app-metric-card
+        label="Avg sentiment"
+        [value]="s.metrics.avgSentimentPct + '%'"
+        [delta]="s.metrics.avgSentimentDelta"
+        deltaClass="down" />
+    </div>
+
+    <!-- AI Summary -->
+    <app-ai-summary-box label="AI summary" [text]="s.aiSummary" />
+
+    <!-- 2-col layout -->
+    <div class="grid-2-1">
+      <div>
+        <!-- Trending themes -->
+        <div class="card">
+          <div class="card-title">Top trending themes</div>
+          @for (theme of s.trendingThemes; track theme.label) {
+            <div class="spark-row" (click)="navigate('opportunities')">
+              <span class="spark-label">{{ theme.label }}</span>
+              @if (theme.trendChip) {
+                <span class="trend-chip" [style.background]="theme.isUrgent ? '#FCEBEB' : '#FCEBEB'" [style.color]="'#A32D2D'">
+                  {{ theme.trendChip }}
+                </span>
+              }
+              <div class="spark-bar-wrap">
+                <div class="spark-bar" [style.width.%]="theme.barWidthPct" [style.background]="theme.barColor"></div>
+              </div>
+              <span class="spark-count">{{ theme.count }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Volume chart -->
+        <div class="card">
+          <div class="card-title">Feedback volume — last 7 days</div>
+          <app-d3-bar-chart [data]="volumeBarData" [height]="110" [highlightLast]="true" />
+        </div>
+      </div>
+
+      <div>
+        <!-- Alerts -->
+        <div class="card">
+          <div class="card-title">Alerts</div>
+          @for (alert of s.alerts; track alert.text) {
+            <div class="alert-row" (click)="navigate(alert.navTarget ?? 'feedback')">
+              <div class="alert-dot" [style.background]="alert.color"></div>
+              <div>
+                <div class="alert-text">{{ alert.text }}</div>
+                <div class="alert-time">{{ alert.time }}</div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Source breakdown -->
+        <div class="card">
+          <div class="card-title">Feedback by source</div>
+          <div class="donut-wrap">
+            <app-d3-donut-chart [data]="donutData" [size]="120" />
+          </div>
+          @for (src of s.sourceBreakdown; track src.name) {
+            <div class="source-row">
+              <div class="source-dot" [style.background]="src.color"></div>
+              <span class="source-name">{{ src.name }}</span>
+              <span class="source-count">{{ src.count.toLocaleString() }}</span>
+              <span class="source-pct">{{ src.pct }}%</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

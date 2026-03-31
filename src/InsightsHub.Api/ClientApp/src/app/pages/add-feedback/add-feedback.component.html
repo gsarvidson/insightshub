@@ -1,0 +1,293 @@
+<div class="main">
+  <div class="page-title">Add feedback</div>
+  <div class="page-sub">Manually log customer feedback or import from a CSV file</div>
+
+  <!-- Tabs -->
+  <div class="af-tabs">
+    <button class="af-tab" [class.active]="activeTab() === 'manual'" (click)="activeTab.set('manual')">
+      Single entry
+    </button>
+    <button class="af-tab" [class.active]="activeTab() === 'csv'" (click)="activeTab.set('csv')">
+      CSV import
+    </button>
+  </div>
+
+  <!-- ── CSV import panel ── -->
+  @if (activeTab() === 'csv') {
+    <div class="af-grid">
+      <div class="af-form">
+
+        @if (csvResult()) {
+          <div class="success-banner">
+            Imported {{ csvResult()!.imported }} row(s) successfully.
+            @if (csvResult()!.skipped > 0) { {{ csvResult()!.skipped }} skipped (no feedback text). }
+            <button class="banner-close" (click)="csvResult.set(null)">✕</button>
+          </div>
+        }
+
+        @if (csvImportError()) {
+          <div class="error-banner">{{ csvImportError() }}</div>
+        }
+
+        <div class="af-row">
+          <div class="af-field">
+            <label class="af-label">Source</label>
+            <select class="af-select" [value]="csvSource()" (change)="csvSource.set($any($event.target).value)">
+              @for (src of sources(); track src) {
+                <option [value]="src">{{ src }}</option>
+              }
+            </select>
+          </div>
+          <div class="af-field">
+            <label class="af-label">CSV file <span class="af-required">*</span></label>
+            <input type="file" class="af-input" accept=".csv,text/csv" (change)="onCsvFileChange($event)" />
+          </div>
+        </div>
+
+        <div class="af-field af-full">
+          <p class="af-hint">
+            Expected columns: <code>Vertical, User type, Created date, Feedback, Who raised it, Impact, Submitted by</code>
+          </p>
+        </div>
+
+        @if (csvParseError()) {
+          <div class="error-banner">{{ csvParseError() }}</div>
+        }
+
+        @if (csvPreview().length > 0) {
+          <div class="af-field af-full">
+            <div class="af-preview-header">Preview — {{ csvPreview().length }} row(s)</div>
+            <div class="af-preview-scroll">
+              <table class="af-preview-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Vertical</th>
+                    <th>User type</th>
+                    <th>Feedback</th>
+                    <th>Who raised it</th>
+                    <th>Impact</th>
+                    <th>Submitted by</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of csvPreview().slice(0, 10); track $index) {
+                    <tr>
+                      <td>{{ row.date }}</td>
+                      <td>{{ row.vertical }}</td>
+                      <td>{{ row.userType }}</td>
+                      <td class="af-preview-text">{{ row.feedback }}</td>
+                      <td>{{ row.whoRaisedIt }}</td>
+                      <td>{{ row.impact }}</td>
+                      <td>{{ row.submittedBy }}</td>
+                    </tr>
+                  }
+                  @if (csvPreview().length > 10) {
+                    <tr><td colspan="7" class="af-preview-more">… and {{ csvPreview().length - 10 }} more rows</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="af-btn-row">
+            <button class="af-submit" [disabled]="csvImporting()" (click)="importCsv()">
+              {{ csvImporting() ? 'Importing…' : 'Import ' + csvPreview().length + ' rows' }}
+            </button>
+          </div>
+        }
+      </div>
+
+      <aside>
+        <div class="card">
+          <div class="card-title">CSV format</div>
+          <ul class="af-tips">
+            <li><strong>Vertical</strong> — product area or team</li>
+            <li><strong>User type</strong> — Consumer, Agent, Dealer…</li>
+            <li><strong>Created date</strong> — any parseable date</li>
+            <li><strong>Feedback</strong> — the verbatim feedback text (required)</li>
+            <li><strong>Who raised it</strong> — customer identifier</li>
+            <li><strong>Impact</strong> — stored as a tag (e.g. High, Medium)</li>
+            <li><strong>Submitted by</strong> — internal submitter, stored in notes</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  }
+
+  <!-- ── Manual entry panel ── -->
+  @if (activeTab() === 'manual') {
+
+  @if (success()) {
+    <div class="success-banner">
+      Feedback saved successfully.
+      <button class="banner-close" (click)="success.set(false)">✕</button>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
+
+  <div class="af-grid">
+    <!-- ── Main form column ── -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="af-form">
+
+      <!-- Feedback text -->
+      <div class="af-field af-full">
+        <label class="af-label" for="af-text">Feedback <span class="af-required">*</span></label>
+        <textarea id="af-text" class="af-textarea" formControlName="text" rows="5"
+          placeholder="Paste or type the customer's feedback verbatim…"></textarea>
+        @if (form.get('text')?.invalid && form.get('text')?.touched) {
+          <div class="af-error">Feedback text is required (min 10 characters)</div>
+        }
+      </div>
+
+      <!-- Source + Customer type -->
+      <div class="af-row">
+        <div class="af-field">
+          <label class="af-label" for="af-source">Source <span class="af-required">*</span></label>
+          <select id="af-source" class="af-select" formControlName="source">
+            <option value="">— Select source —</option>
+            @for (src of sources(); track src) {
+              <option [value]="src">{{ src }}</option>
+            }
+          </select>
+          @if (form.get('source')?.invalid && form.get('source')?.touched) {
+            <div class="af-error">Source is required</div>
+          }
+        </div>
+
+        <div class="af-field">
+          <label class="af-label" for="af-ctype">Customer type</label>
+          <select id="af-ctype" class="af-select" formControlName="customerType">
+            @for (ct of customerTypes(); track ct) {
+              <option [value]="ct">{{ ct }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Vertical / Team + Date -->
+      <div class="af-row">
+        <div class="af-field">
+          <label class="af-label" for="af-vertical">Vertical / Team</label>
+          <select id="af-vertical" class="af-select" formControlName="vertical">
+            <option value="">— None —</option>
+            @for (v of verticals(); track v) {
+              <option [value]="v">{{ v }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="af-field">
+          <label class="af-label" for="af-date">Date</label>
+          <input id="af-date" class="af-input" type="date" formControlName="date" />
+        </div>
+      </div>
+
+      <!-- Customer ID -->
+      <div class="af-row">
+        <div class="af-field">
+          <label class="af-label" for="af-cid">Customer identifier</label>
+          <input id="af-cid" class="af-input" formControlName="customerId"
+            placeholder="e.g. user ID, email, company name" />
+        </div>
+        <div class="af-field"></div>
+      </div>
+
+      <!-- Sentiment -->
+      <div class="af-field">
+        <label class="af-label">Sentiment</label>
+        <div class="sentiment-group">
+          @for (s of sentiments; track s) {
+            <button type="button"
+              class="sentiment-btn"
+              [class]="'sentiment-btn s-' + s"
+              [class.selected]="form.get('sentiment')?.value === s"
+              (click)="setSentiment(s)">
+              {{ sentimentLabel(s) }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Opportunity link -->
+      <div class="af-field">
+        <label class="af-label" for="af-opp">Link to opportunity</label>
+        <select id="af-opp" class="af-select" formControlName="opportunityId">
+          @for (opp of opportunityOptions(); track opp.value) {
+            <option [value]="opp.value">{{ opp.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Tags + Platform -->
+      <div class="af-row">
+        <div class="af-field">
+          <label class="af-label" for="af-tags">Tags</label>
+          <input id="af-tags" class="af-input" formControlName="tags"
+            placeholder="Comma-separated, e.g. mobile, payments" />
+        </div>
+
+        <div class="af-field">
+          <label class="af-label" for="af-platform">Platform</label>
+          <input id="af-platform" class="af-input" formControlName="platform"
+            placeholder="e.g. iOS, Android, Web" />
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="af-field af-full">
+        <label class="af-label" for="af-notes">Internal notes</label>
+        <textarea id="af-notes" class="af-textarea af-textarea-sm" formControlName="notes" rows="3"
+          placeholder="Context, follow-up actions, related tickets…"></textarea>
+      </div>
+
+      <!-- Actions -->
+      <div class="af-btn-row">
+        <button type="submit" class="af-submit" [disabled]="submitting() || form.invalid">
+          {{ submitting() ? 'Saving…' : 'Save feedback' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="clearForm()">Clear form</button>
+      </div>
+
+    </form>
+
+    <!-- ── Right sidebar ── -->
+    <aside>
+      <!-- Tips card -->
+      <div class="card">
+        <div class="card-title">⚡ Tips</div>
+        <ul class="af-tips">
+          <li>Be specific — include product area, user type, and what broke</li>
+          <li>Link to an opportunity to aggregate signal automatically</li>
+          <li>Use tags to surface this in theme analysis</li>
+          <li>Verbatim quotes are more useful than paraphrasing</li>
+        </ul>
+      </div>
+
+      <!-- Recently Added card -->
+      <div class="card" style="margin-top: 1rem;">
+        <div class="card-title">Recently added manually</div>
+        <div class="af-recent-list">
+          <div class="af-recent-item">
+            <div class="af-recent-text">"The auction timer is wrong on mobile..."</div>
+            <div class="af-recent-meta">Motors · 2 days ago</div>
+          </div>
+          <div class="af-recent-item">
+            <div class="af-recent-text">"Sellers can't bulk edit listing fees..."</div>
+            <div class="af-recent-meta">Marketplace · 4 days ago</div>
+          </div>
+          <div class="af-recent-item">
+            <div class="af-recent-text">"Watch list doesn't sync across devices..."</div>
+            <div class="af-recent-meta">Buyers · 1 week ago</div>
+          </div>
+        </div>
+        <a href="#" class="af-view-all">View all feedback →</a>
+      </div>
+    </aside>
+  </div>
+
+  } <!-- end @if manual -->
+</div>

@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/InsightsHub.Api/InsightsHub.Api.csproj" />
+    <Project Path="src/InsightsHub.Worker/InsightsHub.Worker.csproj" />
+  </Folder>
+</Solution>

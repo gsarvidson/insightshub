@@ -1,0 +1,110 @@
+.main {
+  padding: 1.5rem;
+  overflow: auto;
+  flex: 1;
+}
+
+.loading { font-size: 13px; color: var(--color-text-tertiary); }
+
+.metrics {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  &.metrics-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+.spark-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  cursor: pointer;
+
+  &:last-child { border-bottom: none; }
+  &:hover .spark-label { color: var(--color-text-info); }
+}
+
+.spark-label {
+  font-size: 12px;
+  color: var(--color-text-primary);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s;
+}
+
+.trend-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.spark-bar-wrap {
+  width: 80px;
+  height: 6px;
+  background: var(--color-background-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.spark-bar { height: 100%; border-radius: 3px; }
+
+.spark-count {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  width: 28px;
+  text-align: right;
+}
+
+.alert-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  cursor: pointer;
+  &:last-child { border-bottom: none; }
+}
+
+.alert-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.alert-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.4; }
+.alert-time { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+
+.donut-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+}
+
+.source-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.source-name { font-size: 12px; color: var(--color-text-primary); flex: 1; }
+.source-count { font-size: 12px; color: var(--color-text-secondary); }
+.source-pct { font-size: 11px; color: var(--color-text-tertiary); width: 30px; text-align: right; }

@@ -1,0 +1,33 @@
+<div class="shell">
+  <!-- ── Navigation ── -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <img src="reimagine.png" alt="Reimagine logo" class="nav-logo-img" />
+      <div class="nav-logo-name">INSIGHTS HUB</div>
+      <div class="nav-logo-sub">TRADE ME · PRODUCT</div>
+    </div>
+
+    @for (item of primaryNav; track item.route) {
+      <a class="nav-item"
+         [routerLink]="item.route"
+         routerLinkActive="active">
+        {{ item.label }}
+      </a>
+    }
+
+    <div class="nav-divider"></div>
+
+    @for (item of secondaryNav; track item.route) {
+      <a class="nav-item"
+         [routerLink]="item.route"
+         routerLinkActive="active">
+        {{ item.label }}
+      </a>
+    }
+  </nav>
+
+  <!-- ── Main content ── -->
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>
